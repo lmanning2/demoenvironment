@@ -1,5 +1,4 @@
-import { getMetadata } from '../../scripts/aem.js';
-import { loadFragment } from '../fragment/fragment.js';
+import navContent from './nav-content.js';
 
 // media query match that indicates mobile/tablet width
 const isDesktop = window.matchMedia('(min-width: 900px)');
@@ -136,14 +135,11 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
  * @param {Element} block The header block element
  */
 export default async function decorate(block) {
-  // load nav as fragment
-  const navMeta = getMetadata('nav');
-  const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
-  // local dev serves content under /content; fall back to configured/root nav for production
-  let fragment = await loadFragment('/content/nav');
-  if (!fragment) {
-    fragment = await loadFragment(navPath);
-  }
+  // Nav content is bundled in code (nav-content.js) rather than loaded from a
+  // content document, so the header renders on any environment (including
+  // previews where a da.live nav document is not published).
+  const fragment = document.createElement('div');
+  fragment.innerHTML = navContent;
 
   // decorate nav DOM
   block.textContent = '';
