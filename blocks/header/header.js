@@ -116,7 +116,11 @@ export default async function decorate(block) {
   // load nav as fragment
   const navMeta = getMetadata('nav');
   const navPath = navMeta ? new URL(navMeta, window.location).pathname : '/nav';
-  const fragment = await loadFragment(navPath);
+  // local dev serves content under /content; fall back to configured/root nav for production
+  let fragment = await loadFragment('/content/nav');
+  if (!fragment) {
+    fragment = await loadFragment(navPath);
+  }
 
   // decorate nav DOM
   block.textContent = '';
@@ -148,6 +152,30 @@ export default async function decorate(block) {
           navSection.setAttribute('aria-expanded', expanded ? 'false' : 'true');
         }
       });
+    });
+  }
+
+  // tools dropdowns (country, currency, language) — toggle open on click
+  const navTools = nav.querySelector('.nav-tools');
+  if (navTools) {
+    const toolItems = navTools.querySelectorAll(':scope ul > li');
+    toolItems.forEach((item) => {
+      if (!item.querySelector('ul')) return;
+      item.classList.add('nav-tools-drop');
+      item.setAttribute('aria-expanded', 'false');
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        const expanded = item.getAttribute('aria-expanded') === 'true';
+        toolItems.forEach((i) => i.setAttribute('aria-expanded', 'false'));
+        item.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+      });
+    });
+    // close tools dropdowns on outside click
+    document.addEventListener('click', (e) => {
+      if (!navTools.contains(e.target)) {
+        toolItems.forEach((i) => i.setAttribute('aria-expanded', 'false'));
+      }
     });
   }
 
