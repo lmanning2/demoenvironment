@@ -9,7 +9,11 @@ export default async function decorate(block) {
   // load footer as fragment
   const footerMeta = getMetadata('footer');
   const footerPath = footerMeta ? new URL(footerMeta, window.location).pathname : '/footer';
-  const fragment = await loadFragment(footerPath);
+  // local dev serves content under /content; fall back to configured/root footer for production
+  let fragment = await loadFragment('/content/footer');
+  if (!fragment) {
+    fragment = await loadFragment(footerPath);
+  }
 
   // decorate footer DOM
   block.textContent = '';
