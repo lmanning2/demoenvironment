@@ -54,13 +54,36 @@ function focusNavSection() {
 }
 
 /**
+ * Returns the top-level <ul> within a container — the outermost list that is
+ * not nested inside an <li>. Resilient to how the content source wraps lists
+ * (e.g. da.live may or may not preserve a .default-content-wrapper).
+ * @param {Element} container
+ * @returns {HTMLUListElement|null}
+ */
+function getTopLevelList(container) {
+  if (!container) return null;
+  const lists = [...container.querySelectorAll('ul')];
+  return lists.find((ul) => !ul.parentElement?.closest('li')) || lists[0] || null;
+}
+
+/**
+ * Returns the direct <li> children of a container's top-level list.
+ * @param {Element} container
+ * @returns {HTMLLIElement[]}
+ */
+function getTopLevelItems(container) {
+  const list = getTopLevelList(container);
+  return list ? [...list.children].filter((el) => el.tagName === 'LI') : [];
+}
+
+/**
  * Toggles all nav sections
  * @param {Element} sections The container element
  * @param {Boolean} expanded Whether the element should be expanded or collapsed
  */
 function toggleAllNavSections(sections, expanded = false) {
   if (!sections) return;
-  sections.querySelectorAll('.nav-sections .default-content-wrapper > ul > li').forEach((section) => {
+  getTopLevelItems(sections).forEach((section) => {
     section.setAttribute('aria-expanded', expanded);
   });
 }
@@ -128,22 +151,51 @@ export default async function decorate(block) {
   nav.id = 'nav';
   while (fragment.firstElementChild) nav.append(fragment.firstElementChild);
 
-  const classes = ['brand', 'sections', 'tools'];
-  classes.forEach((c, i) => {
-    const section = nav.children[i];
-    if (section) section.classList.add(`nav-${c}`);
-  });
+  // Classify the three top-level sections by CONTENT rather than by position.
+  // da.live can drop/reorder wrapper divs, so positional [0,1,2] assignment is
+  // fragile. Brand = the block whose only meaningful content is a linked image;
+  // tools = the utility block (short items: flag/currency/language/AirRewards);
+  // sections = the main nav list. Fall back to positional order if ambiguous.
+  const blocks = [...nav.children];
+  const isBrandBlock = (el) => {
+    const links = el.querySelectorAll('a');
+    return el.querySelector('img') && links.length <= 1 && !el.querySelector('h1, h2, h3, h4, h5, h6');
+  };
+  const listItemCount = (el) => getTopLevelItems(el).length;
 
-  const navBrand = nav.querySelector('.nav-brand');
-  const brandLink = navBrand.querySelector('.button');
-  if (brandLink) {
-    brandLink.className = '';
-    brandLink.closest('.button-container').className = '';
+  let navBrand = blocks.find(isBrandBlock);
+  const remaining = blocks.filter((el) => el !== navBrand);
+  // main nav = block with the most top-level list items; tools = the other list block
+  remaining.sort((a, b) => listItemCount(b) - listItemCount(a));
+  let navSections = remaining[0];
+  let navTools = remaining.find((el) => el !== navSections && getTopLevelList(el));
+
+  // Fallbacks preserve original behavior when classification is inconclusive.
+  if (!navBrand) [navBrand] = blocks;
+  if (!navSections) [, navSections] = blocks;
+  if (!navTools) [, , navTools] = blocks;
+
+  if (navBrand) navBrand.classList.add('nav-brand');
+  if (navSections) navSections.classList.add('nav-sections');
+  if (navTools && navTools !== navSections) navTools.classList.add('nav-tools');
+
+  // Tag the top-level lists with stable classes so CSS does not depend on
+  // wrapper structure (.default-content-wrapper), which da.live may not emit.
+  const sectionsList = getTopLevelList(navSections);
+  if (sectionsList) sectionsList.classList.add('nav-sections-list');
+  const toolsList = navTools && navTools !== navSections ? getTopLevelList(navTools) : null;
+  if (toolsList) toolsList.classList.add('nav-tools-list');
+
+  if (navBrand) {
+    const brandLink = navBrand.querySelector('.button');
+    if (brandLink) {
+      brandLink.className = '';
+      brandLink.closest('.button-container').className = '';
+    }
   }
 
-  const navSections = nav.querySelector('.nav-sections');
   if (navSections) {
-    navSections.querySelectorAll(':scope .default-content-wrapper > ul > li').forEach((navSection) => {
+    getTopLevelItems(navSections).forEach((navSection) => {
       if (navSection.querySelector('ul')) navSection.classList.add('nav-drop');
       navSection.addEventListener('click', () => {
         if (isDesktop.matches) {
@@ -156,9 +208,8 @@ export default async function decorate(block) {
   }
 
   // tools dropdowns (country, currency, language) — toggle open on click
-  const navTools = nav.querySelector('.nav-tools');
-  if (navTools) {
-    const toolItems = navTools.querySelectorAll(':scope ul > li');
+  if (navTools && navTools !== navSections) {
+    const toolItems = getTopLevelItems(navTools);
     toolItems.forEach((item) => {
       if (!item.querySelector('ul')) return;
       item.classList.add('nav-tools-drop');

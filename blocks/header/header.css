@@ -249,17 +249,17 @@ header nav .nav-sections ul > li > ul > li {
     margin: 0;
   }
 
-  header nav .nav-sections .default-content-wrapper > ul > li {
+  header nav .nav-sections .nav-sections-list > li {
     flex: 0 1 auto;
     position: relative;
   }
 
-  header nav .nav-sections .default-content-wrapper > ul > li > ul {
+  header nav .nav-sections .nav-sections-list > li > ul {
     display: none;
     position: relative;
   }
 
-  header nav .nav-sections .default-content-wrapper > ul > li[aria-expanded='true'] > ul {
+  header nav .nav-sections .nav-sections-list > li[aria-expanded='true'] > ul {
     display: block;
     position: absolute;
     left: -24px;
@@ -274,7 +274,7 @@ header nav .nav-sections ul > li > ul > li {
     z-index: 3;
   }
 
-  header nav .nav-sections .default-content-wrapper > ul > li > ul::before {
+  header nav .nav-sections .nav-sections-list > li > ul::before {
     content: '';
     position: absolute;
     top: -8px;
@@ -286,16 +286,16 @@ header nav .nav-sections ul > li > ul > li {
     border-bottom: 8px solid #fff;
   }
 
-  header nav .nav-sections .default-content-wrapper > ul > li > ul > li {
+  header nav .nav-sections .nav-sections-list > li > ul > li {
     padding: 8px 0;
   }
 
   /* dropdown links sit on a white panel — use dark text with red hover */
-  header nav .nav-sections .default-content-wrapper > ul > li > ul a:any-link {
+  header nav .nav-sections .nav-sections-list > li > ul a:any-link {
     color: var(--text-color);
   }
 
-  header nav .nav-sections .default-content-wrapper > ul > li > ul a:hover {
+  header nav .nav-sections .nav-sections-list > li > ul a:hover {
     color: var(--link-color);
     opacity: 1;
   }
@@ -307,7 +307,7 @@ header nav .nav-tools {
 }
 
 /* stylelint-disable-next-line no-descending-specificity */
-header nav .nav-tools .default-content-wrapper > ul {
+header nav .nav-tools .nav-tools-list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -317,7 +317,7 @@ header nav .nav-tools .default-content-wrapper > ul {
 }
 
 /* stylelint-disable-next-line no-descending-specificity */
-header nav .nav-tools .default-content-wrapper > ul > li {
+header nav .nav-tools .nav-tools-list > li {
   font-size: var(--body-font-size-s);
   font-weight: 500;
   position: relative;
@@ -334,13 +334,13 @@ header nav .nav-tools img {
 }
 
 /* flag icon is slightly smaller with a subtle border */
-header nav .nav-tools .default-content-wrapper > ul > li:first-child > a img {
+header nav .nav-tools .nav-tools-list > li:first-child > a img {
   height: 14px;
   border: 1px solid rgb(255 255 255 / 40%);
 }
 
 /* AirRewards logo icon is wider */
-header nav .nav-tools .default-content-wrapper > ul > li:last-child > a img {
+header nav .nav-tools .nav-tools-list > li:last-child > a img {
   height: 20px;
 }
 
