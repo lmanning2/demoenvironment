@@ -15,10 +15,43 @@ export default async function decorate(block) {
     fragment = await loadFragment(footerPath);
   }
 
-  // decorate footer DOM
   block.textContent = '';
   const footer = document.createElement('div');
   while (fragment.firstElementChild) footer.append(fragment.firstElementChild);
+
+  // Rebuild structure from content so it is resilient to how the source is stored.
+  // Document Authoring flattens authored wrapper <div>s, so we cannot rely on them —
+  // instead we group each heading with the list that follows it into a column.
+  const headings = [...footer.querySelectorAll('h1, h2, h3, h4, h5, h6')];
+  const socialList = [...footer.querySelectorAll('ul')].find(
+    (ul) => ul.querySelector('a img') && !ul.previousElementSibling?.matches?.('h1, h2, h3, h4, h5, h6'),
+  );
+  const copyright = [...footer.querySelectorAll('p')].find((p) => /copyright/i.test(p.textContent));
+
+  if (headings.length) {
+    const columns = document.createElement('div');
+    columns.className = 'footer-columns';
+    headings.forEach((heading) => {
+      const col = document.createElement('div');
+      col.className = 'footer-column';
+      const list = heading.nextElementSibling;
+      col.append(heading);
+      if (list && list.tagName === 'UL') col.append(list);
+      columns.append(col);
+    });
+
+    const bottom = document.createElement('div');
+    bottom.className = 'footer-bottom';
+    if (copyright) bottom.append(copyright);
+    if (socialList) {
+      socialList.classList.add('footer-social');
+      bottom.append(socialList);
+    }
+
+    footer.textContent = '';
+    footer.append(columns);
+    if (bottom.childElementCount) footer.append(bottom);
+  }
 
   block.append(footer);
 }

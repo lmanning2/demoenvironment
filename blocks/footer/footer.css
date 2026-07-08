@@ -16,7 +16,7 @@ footer .footer p {
 }
 
 /* link columns */
-footer .footer > div > div:first-child {
+footer .footer .footer-columns {
   display: grid;
   grid-template-columns: 1fr;
   gap: 24px 32px;
@@ -51,7 +51,7 @@ footer .footer a:hover {
 }
 
 /* bottom bar: copyright + social */
-footer .footer > div > div:last-child {
+footer .footer .footer-bottom {
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -62,25 +62,25 @@ footer .footer > div > div:last-child {
   text-align: center;
 }
 
-footer .footer > div > div:last-child ul {
+footer .footer .footer-social {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 16px;
 }
 
-footer .footer > div > div:last-child li {
+footer .footer .footer-social li {
   margin: 0;
 }
 
-footer .footer > div > div:last-child img {
+footer .footer .footer-social img {
   width: 24px;
   height: 24px;
   display: block;
 }
 
 @media (width >= 600px) {
-  footer .footer > div > div:first-child {
+  footer .footer .footer-columns {
     grid-template-columns: repeat(2, 1fr);
   }
 }
@@ -90,11 +90,11 @@ footer .footer > div > div:last-child img {
     padding: 40px 32px 24px;
   }
 
-  footer .footer > div > div:first-child {
+  footer .footer .footer-columns {
     grid-template-columns: repeat(4, 1fr);
   }
 
-  footer .footer > div > div:last-child {
+  footer .footer .footer-bottom {
     flex-direction: row;
     justify-content: space-between;
   }
