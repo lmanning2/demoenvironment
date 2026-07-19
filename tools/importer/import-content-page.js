@@ -4,6 +4,7 @@
 // PARSER IMPORTS
 import accordionFaqParser from './parsers/accordion-faq.js';
 import formContactParser from './parsers/form-contact.js';
+import tableParser from './parsers/table.js';
 
 // TRANSFORMER IMPORTS
 import cleanupTransformer from './transformers/nileair-cleanup.js';
@@ -21,6 +22,7 @@ const PAGE_TEMPLATE = {
   blocks: [
     { name: 'accordion-faq', instances: ['div.faq-box-area', '#pets', '#travelling-with-pets-faqs', '#baggage-allowance-faqs', '#why-choose-nile-air-holidays', '#nileair-holidays-faqs'] },
     { name: 'form-contact', instances: ['#contact-us'] },
+    { name: 'table', instances: ['div.pr-area-table table', '#layout-content table'] },
   ],
   sections: [
     { id: 'rc4c1', name: 'Breadcrumb / page title', selector: '#layout-content > div.bread-crumbs', style: null, blocks: [], defaultContent: ['#layout-content > div.bread-crumbs'] },
@@ -36,6 +38,7 @@ const PAGE_TEMPLATE = {
 const parsers = {
   'accordion-faq': accordionFaqParser,
   'form-contact': formContactParser,
+  table: tableParser,
 };
 
 // TRANSFORMER REGISTRY

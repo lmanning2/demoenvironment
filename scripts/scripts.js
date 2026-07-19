@@ -82,9 +82,6 @@ function buildBookingWidget(main) {
   // only the top-level page main, never fragments (e.g. the footer fragment,
   // which also runs decorateMain and would otherwise get its own widget).
   if (main !== document.querySelector('main')) return;
-  const path = window.location.pathname.replace(/\.html$/, '');
-  const isHome = path === '/' || path.endsWith('/index');
-  if (!isHome) return;
   if (main.querySelector('.booking-widget')) return;
   const section = document.createElement('div');
   section.append(buildBlock('booking-widget', { elems: [] }));

@@ -55,6 +55,11 @@ export default function transform(hookName, element, payload) {
       '[id*="livechat"]',
       '[class*="livechat"]',
       '[class*="live-chat"]',
+      // Salesforce live-chat button ("Live chat: Agent Offline").
+      '.embeddedServiceHelpButton',
+      '[class*="embeddedService"]',
+      // date-range-picker widgets (render stray "Cancel"/"Apply" text).
+      'div.daterangepicker',
     ]);
 
     // Scripts, styles, tracking pixels, embeds and other non-content elements.

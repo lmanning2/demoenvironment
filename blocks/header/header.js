@@ -186,15 +186,25 @@ export default async function decorate(block) {
       });
     });
 
-    // Desktop: open mega-menu on hover.
+    // Desktop: open mega-menu on hover, with a short close delay so the pointer
+    // can travel from the trigger to the panel without it snapping shut.
+    let closeTimer;
     getTopLevelItems(navSections).forEach((navSection) => {
       navSection.addEventListener('mouseenter', () => {
-        if (isDesktop.matches && navSection.classList.contains('nav-drop')) {
-          navSection.setAttribute('aria-expanded', 'true');
-        }
+        if (!isDesktop.matches || !navSection.classList.contains('nav-drop')) return;
+        clearTimeout(closeTimer);
+        // close any other open item, then open this one
+        getTopLevelItems(navSections).forEach((s) => {
+          if (s !== navSection) s.setAttribute('aria-expanded', 'false');
+        });
+        navSection.setAttribute('aria-expanded', 'true');
       });
       navSection.addEventListener('mouseleave', () => {
-        if (isDesktop.matches) navSection.setAttribute('aria-expanded', 'false');
+        if (!isDesktop.matches) return;
+        clearTimeout(closeTimer);
+        closeTimer = setTimeout(() => {
+          navSection.setAttribute('aria-expanded', 'false');
+        }, 200);
       });
     });
   }

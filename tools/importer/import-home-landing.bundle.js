@@ -295,7 +295,12 @@ var CustomImportScript = (() => {
         "#fileUploadForm",
         '[id*="livechat"]',
         '[class*="livechat"]',
-        '[class*="live-chat"]'
+        '[class*="live-chat"]',
+        // Salesforce live-chat button ("Live chat: Agent Offline").
+        ".embeddedServiceHelpButton",
+        '[class*="embeddedService"]',
+        // date-range-picker widgets (render stray "Cancel"/"Apply" text).
+        "div.daterangepicker"
       ]);
       WebImporter.DOMUtils.remove(element, [
         "script",

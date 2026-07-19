@@ -54,7 +54,8 @@
       "description": "Interior content page sharing a common layout: site header + booking widget, breadcrumbs, a page title, one or more rich-text sections (some with a cover image), optional data table (baggage), optional accordion / FAQ sections, and on some pages a contact form. Followed by social bar and footer.",
       "blocks": [
         { "name": "accordion-faq", "instances": ["div.faq-box-area", "#pets", "#travelling-with-pets-faqs", "#baggage-allowance-faqs", "#why-choose-nile-air-holidays", "#nileair-holidays-faqs"] },
-        { "name": "form-contact", "instances": ["#contact-us"] }
+        { "name": "form-contact", "instances": ["#contact-us"] },
+        { "name": "table", "instances": ["div.pr-area-table table", "#layout-content table"] }
       ],
       "sections": [
         { "id": "rc4c1", "name": "Breadcrumb / page title", "selector": "#layout-content > div.bread-crumbs", "style": null, "blocks": [], "defaultContent": ["#layout-content > div.bread-crumbs"] },

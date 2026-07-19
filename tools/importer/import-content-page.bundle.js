@@ -126,6 +126,30 @@ var CustomImportScript = (() => {
     element.replaceWith(block);
   }
 
+  // tools/importer/parsers/table.js
+  function parse3(element, { document }) {
+    const table = element.matches("table") ? element : element.querySelector("table");
+    if (!table) {
+      element.replaceWith(...element.childNodes);
+      return;
+    }
+    const cells = [];
+    table.querySelectorAll("tr").forEach((tr) => {
+      const rowCells = [...tr.children].map((cell) => cell.textContent.trim());
+      if (rowCells.some((t) => t)) cells.push(rowCells);
+    });
+    if (cells.length === 0) {
+      element.replaceWith(...element.childNodes);
+      return;
+    }
+    const block = WebImporter.Blocks.createBlock(document, {
+      name: "table",
+      variants: ["striped"],
+      cells
+    });
+    element.replaceWith(block);
+  }
+
   // tools/importer/transformers/nileair-cleanup.js
   var TransformHook = { beforeTransform: "beforeTransform", afterTransform: "afterTransform" };
   function transform(hookName, element, payload) {
@@ -134,7 +158,11 @@ var CustomImportScript = (() => {
         "#cookie-consent-banner",
         "#cookie-consent-dialog",
         "#cookie-consent-scripts",
-        "#alerts"
+        "#alerts",
+        // mobile off-canvas menu (duplicates header nav as a flat link dump);
+        // handled by the header block, not page content.
+        "div.offcanvas",
+        "div.offcanvas-start"
       ]);
       WebImporter.DOMUtils.remove(element, ["div.owl-item.cloned"]);
     }
@@ -150,7 +178,12 @@ var CustomImportScript = (() => {
         "#fileUploadForm",
         '[id*="livechat"]',
         '[class*="livechat"]',
-        '[class*="live-chat"]'
+        '[class*="live-chat"]',
+        // Salesforce live-chat button ("Live chat: Agent Offline").
+        ".embeddedServiceHelpButton",
+        '[class*="embeddedService"]',
+        // date-range-picker widgets (render stray "Cancel"/"Apply" text).
+        "div.daterangepicker"
       ]);
       WebImporter.DOMUtils.remove(element, [
         "script",
@@ -207,7 +240,8 @@ var CustomImportScript = (() => {
     ],
     blocks: [
       { name: "accordion-faq", instances: ["div.faq-box-area", "#pets", "#travelling-with-pets-faqs", "#baggage-allowance-faqs", "#why-choose-nile-air-holidays", "#nileair-holidays-faqs"] },
-      { name: "form-contact", instances: ["#contact-us"] }
+      { name: "form-contact", instances: ["#contact-us"] },
+      { name: "table", instances: ["div.pr-area-table table", "#layout-content table"] }
     ],
     sections: [
       { id: "rc4c1", name: "Breadcrumb / page title", selector: "#layout-content > div.bread-crumbs", style: null, blocks: [], defaultContent: ["#layout-content > div.bread-crumbs"] },
@@ -220,7 +254,8 @@ var CustomImportScript = (() => {
   };
   var parsers = {
     "accordion-faq": parse,
-    "form-contact": parse2
+    "form-contact": parse2,
+    table: parse3
   };
   var transformers = [
     transform,
