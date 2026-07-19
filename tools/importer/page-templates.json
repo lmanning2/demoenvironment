@@ -4,127 +4,65 @@
   },
   "templates": [
     {
-      "name": "plan-landing",
+      "name": "home-landing",
       "urls": [
-        "https://www.airarabia.com/en/plan/flying-with-us/flying-with-convenience"
+        "https://www.nileair.com/"
       ],
-      "representativeUrl": "https://www.airarabia.com/en/plan/flying-with-us/flying-with-convenience",
+      "representativeUrl": "https://www.nileair.com/",
       "coverageGaps": [],
-      "description": "Marketing landing page under /plan with a promo banner, page title, intro rich text, and multiple card grids (fare options, check-in options, onboard comfort features, a promo/CTA card, and a bottom CTA card row), plus site header and footer.",
+      "description": "Home landing page: site header with primary nav, a flight-booking search widget (tabs: Flights / My Bookings / Flight Status), a hero image carousel with headline+CTA slides, a quick-links feature strip, a 'Why choose Nile Air?' benefits grid, a promotions carousel of fare cards, a news room section, an app-download banner, an FAQ accordion, a newsletter signup, plus social bar and footer.",
       "blocks": [
-        {
-          "name": "cards-fare",
-          "instances": [
-            "div.component.snippet.col-lg-12.col-xl-12"
-          ]
-        },
-        {
-          "name": "cards-usp",
-          "instances": [
-            "#content > div.component.container > div.component-content > div.row > div.component.snippet.col-12.initialized:nth-of-type(7)",
-            "#content > div.component.container > div.component-content > div.row > div.component.snippet.col-12.initialized:nth-of-type(9)",
-            "#content > div.component.container > div.component-content > div.row > div.component.snippet.col-12.hide-all-mobile.container-fluid-grey.initialized"
-          ]
-        },
-        {
-          "name": "columns-promo",
-          "instances": [
-            "#content > div.component.container > div.component-content > div.row > div.component.rich-text.col-12:nth-of-type(10)"
-          ]
-        },
-        {
-          "name": "section-cta-grey",
-          "instances": [
-            "#content > div.component.container > div.component-content > div.row > div.component.snippet.col-12.hide-all-mobile.container-fluid-grey.initialized"
-          ],
-          "section": "grey"
-        }
+        { "name": "carousel-hero", "instances": ["div.slider_area.owl-carousel"] },
+        { "name": "cards-quicklink", "instances": ["div.feature-area.demo_bg", "div.choose-area .row"] },
+        { "name": "carousel-fare", "instances": ["div.promotions_area .promotions_slide"] },
+        { "name": "cards-news", "instances": ["div.container.news-room"] },
+        { "name": "columns-appbanner", "instances": ["div.app-area.max-bg"] },
+        { "name": "accordion-faq", "instances": ["div.faq-area.gray_bg"] },
+        { "name": "columns-newsletter", "instances": ["div.newsletter-area"] },
+        { "name": "section-faq", "instances": ["div.faq-area.gray_bg"], "section": "grey" }
       ],
       "sections": [
+        { "id": "rc4c1", "name": "Hero image carousel", "selector": "div.slider_area.owl-carousel", "style": null, "blocks": ["carousel-hero"], "defaultContent": [] },
+        { "id": "rc4c2", "name": "Quick-links feature strip", "selector": "div.feature-area.demo_bg", "style": null, "blocks": ["cards-quicklink"], "defaultContent": [] },
+        { "id": "rc4c3", "name": "Why choose Nile Air benefits grid", "selector": "div.choose-area.pb-4", "style": null, "blocks": ["cards-quicklink"], "defaultContent": ["div.choose-area .section-title"] },
+        { "id": "rc4c4", "name": "Promotions carousel", "selector": "div.promotions_area", "style": null, "blocks": ["carousel-fare"], "defaultContent": ["div.promotions_area h1", "div.promotions_area .more_btn"] },
+        { "id": "rc4c5", "name": "News Room", "selector": "div.container.news-room", "style": null, "blocks": ["cards-news"], "defaultContent": ["div.news-room h1", "div.news-room .more_btn"] },
+        { "id": "rc4c6", "name": "App-download banner", "selector": "div.app-area.max-bg", "style": null, "blocks": ["columns-appbanner"], "defaultContent": [] },
+        { "id": "rc4c7", "name": "FAQ accordion", "selector": "div.faq-area.gray_bg", "style": "grey", "blocks": ["accordion-faq"], "defaultContent": ["div.faq-area h2"] },
+        { "id": "rc4c8", "name": "Newsletter signup", "selector": "div.newsletter-area", "style": null, "blocks": ["columns-newsletter"], "defaultContent": ["div.newsletter-content"] }
+      ]
+    },
+    {
+      "name": "content-page",
+      "urls": [
+        "https://www.nileair.com/travelling-pets",
+        "https://www.nileair.com/baggage-allowance",
+        "https://www.nileair.com/nileair-holidays"
+      ],
+      "representativeUrl": "https://www.nileair.com/travelling-pets",
+      "coverageGaps": [
         {
-          "id": "rc2",
-          "name": "Promo banner",
-          "selector": "#content > div.component.container > div.component-content > div.row > div.component.banner-promo.full-width-banner.col-12.col-lg-6.air-reward",
-          "style": null,
-          "blocks": [],
-          "defaultContent": [
-            "div.component.banner-promo.full-width-banner"
+          "url": "https://www.nileair.com/baggage-allowance",
+          "sections": [
+            {
+              "sectionSignature": "s(s(5x1,s(,,,,,,,,)))",
+              "nodeMapId": "rc4c3"
+            }
           ]
-        },
-        {
-          "id": "rc3",
-          "name": "Page title",
-          "selector": "#content > div.component.container > div.component-content > div.row > div.component.title.col-12",
-          "style": null,
-          "blocks": [],
-          "defaultContent": [
-            "div.component.title.col-12"
-          ]
-        },
-        {
-          "id": "rc4",
-          "name": "Intro",
-          "selector": "#content > div.component.container > div.component-content > div.row > div.component.rich-text.col-12:nth-of-type(3)",
-          "style": null,
-          "blocks": [],
-          "defaultContent": [
-            "div.component.rich-text.col-12:nth-of-type(3)"
-          ]
-        },
-        {
-          "id": "rc5",
-          "name": "Fare options",
-          "selector": "#content > div.component.container > div.component-content > div.row > div.component.snippet.col-lg-12.col-xl-12.initialized",
-          "style": null,
-          "blocks": [
-            "cards-fare"
-          ],
-          "defaultContent": []
-        },
-        {
-          "id": "rc6-8",
-          "name": "Check-in options",
-          "selector": "#content > div.component.container > div.component-content > div.row > div.component.snippet.col-12.initialized:nth-of-type(7)",
-          "style": null,
-          "blocks": [
-            "cards-usp"
-          ],
-          "defaultContent": [
-            "div.component.rich-text.col-12:nth-of-type(5)"
-          ]
-        },
-        {
-          "id": "rc9-10",
-          "name": "Comfort onboard",
-          "selector": "#content > div.component.container > div.component-content > div.row > div.component.snippet.col-12.initialized:nth-of-type(9)",
-          "style": null,
-          "blocks": [
-            "cards-usp"
-          ],
-          "defaultContent": [
-            "div.component.rich-text.col-12:nth-of-type(8)"
-          ]
-        },
-        {
-          "id": "rc11",
-          "name": "Block Your Ticket promo",
-          "selector": "#content > div.component.container > div.component-content > div.row > div.component.rich-text.col-12:nth-of-type(10)",
-          "style": null,
-          "blocks": [
-            "columns-promo"
-          ],
-          "defaultContent": []
-        },
-        {
-          "id": "rc12-13",
-          "name": "Bottom CTA cards",
-          "selector": "#content > div.component.container > div.component-content > div.row > div.component.snippet.col-12.hide-all-mobile.container-fluid-grey.initialized",
-          "style": "grey",
-          "blocks": [
-            "cards-usp"
-          ],
-          "defaultContent": []
         }
+      ],
+      "description": "Interior content page sharing a common layout: site header + booking widget, breadcrumbs, a page title, one or more rich-text sections (some with a cover image), optional data table (baggage), optional accordion / FAQ sections, and on some pages a contact form. Followed by social bar and footer.",
+      "blocks": [
+        { "name": "accordion-faq", "instances": ["div.faq-box-area", "#pets", "#travelling-with-pets-faqs", "#baggage-allowance-faqs", "#why-choose-nile-air-holidays", "#nileair-holidays-faqs"] },
+        { "name": "form-contact", "instances": ["#contact-us"] }
+      ],
+      "sections": [
+        { "id": "rc4c1", "name": "Breadcrumb / page title", "selector": "#layout-content > div.bread-crumbs", "style": null, "blocks": [], "defaultContent": ["#layout-content > div.bread-crumbs"] },
+        { "id": "rc4c2", "name": "Intro rich-text with cover image", "selector": "#layout-content > div.page-wrapper:nth-of-type(2)", "style": null, "blocks": [], "defaultContent": ["#layout-content > div.page-wrapper:nth-of-type(2) .about-content"] },
+        { "id": "rc4c3", "name": "Rich-text / data table", "selector": "#layout-content > div.page-wrapper:nth-of-type(3)", "style": null, "blocks": [], "defaultContent": ["#layout-content > div.page-wrapper:nth-of-type(3)"] },
+        { "id": "rc4c4", "name": "Accordion section", "selector": "#layout-content > div.page-wrapper:nth-of-type(4)", "style": null, "blocks": ["accordion-faq"], "defaultContent": ["#layout-content > div.page-wrapper:nth-of-type(4) .about-content"] },
+        { "id": "rc4c5", "name": "Contact form", "selector": "#layout-content > div.page-wrapper:nth-of-type(5)", "style": null, "blocks": ["form-contact"], "defaultContent": [] },
+        { "id": "rc4c6", "name": "FAQ accordion", "selector": "#layout-content > div.page-wrapper:nth-of-type(6)", "style": null, "blocks": ["accordion-faq"], "defaultContent": ["#layout-content > div.page-wrapper:nth-of-type(6) .about-content"] }
       ]
     }
   ]

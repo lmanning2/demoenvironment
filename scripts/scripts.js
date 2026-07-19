@@ -74,11 +74,30 @@ function buildWidgetAutoBlocks(main) {
 }
 
 /**
+ * Injects the static booking-widget block at the top of the homepage main,
+ * overlapping the hero. Homepage only; safe to call on every page.
+ * @param {Element} main The container element
+ */
+function buildBookingWidget(main) {
+  // only the top-level page main, never fragments (e.g. the footer fragment,
+  // which also runs decorateMain and would otherwise get its own widget).
+  if (main !== document.querySelector('main')) return;
+  const path = window.location.pathname.replace(/\.html$/, '');
+  const isHome = path === '/' || path.endsWith('/index');
+  if (!isHome) return;
+  if (main.querySelector('.booking-widget')) return;
+  const section = document.createElement('div');
+  section.append(buildBlock('booking-widget', { elems: [] }));
+  main.prepend(section);
+}
+
+/**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
  */
 function buildAutoBlocks(main) {
   try {
+    buildBookingWidget(main);
     // auto load `*/fragments/*` references
     const fragments = [...main.querySelectorAll('a[href*="/fragments/"]')].filter((f) => !f.closest('.fragment'));
     if (fragments.length > 0) {

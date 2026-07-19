@@ -1,0 +1,245 @@
+/* stylelint-disable no-descending-specificity */
+
+:root {
+  --nileair-navy: rgb(22 40 68);
+  --nileair-gold: rgb(196 175 121);
+}
+
+/* the widget sits in its own auto-blocked section, overlapping the hero */
+.booking-widget-container {
+  position: relative;
+  z-index: 5;
+  margin: 0 auto;
+  max-width: 1200px;
+  padding: 0 16px;
+}
+
+/* sits below the header; overlaps the hero carousel that follows */
+.section.booking-widget-container {
+  padding-top: 48px;
+  margin-bottom: -110px;
+  position: relative;
+  z-index: 5;
+}
+
+.booking-widget {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 16px 41px rgb(0 0 0 / 18%);
+  overflow: hidden;
+}
+
+.booking-widget-inner {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== tab strip ===== */
+.booking-widget-tabs {
+  display: flex;
+  gap: 4px;
+  background: var(--nileair-navy);
+  padding: 0 16px;
+}
+
+.booking-widget-tab {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: rgb(255 255 255 / 70%);
+  font-size: 16px;
+  font-weight: 500;
+  padding: 16px 20px;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+}
+
+.booking-widget-tab.active {
+  color: #fff;
+  border-bottom-color: var(--nileair-gold);
+}
+
+.booking-widget-tab:hover {
+  color: #fff;
+}
+
+/* ===== search form ===== */
+.booking-widget-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 12px;
+  padding: 20px 16px;
+}
+
+.booking-widget-airport {
+  appearance: none;
+  border: 1px solid #e2e6ea;
+  background: #fff;
+  border-radius: 10px;
+  padding: 10px 18px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+  flex: 1 1 160px;
+}
+
+.booking-widget-code {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--nileair-navy);
+  line-height: 1.1;
+}
+
+.booking-widget-city {
+  font-size: 13px;
+  color: #6b7688;
+}
+
+.booking-widget-swap {
+  appearance: none;
+  border: 1px solid #e2e6ea;
+  background: #fff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  align-self: center;
+  font-size: 18px;
+  color: var(--nileair-navy);
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.booking-widget-trip,
+.booking-widget-field {
+  border: 1px solid #e2e6ea;
+  border-radius: 10px;
+  padding: 10px 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 150px;
+  flex: 1 1 150px;
+  cursor: pointer;
+  position: relative;
+}
+
+.booking-widget-label {
+  font-size: 13px;
+  color: #6b7688;
+}
+
+.booking-widget-value,
+.booking-widget-trip-current {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--nileair-navy);
+}
+
+.booking-widget-trip-list {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 4px 0 0;
+  padding: 6px 0;
+  list-style: none;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 15%);
+  z-index: 10;
+}
+
+.booking-widget-trip.open .booking-widget-trip-list {
+  display: block;
+}
+
+.booking-widget-trip-list li {
+  padding: 8px 18px;
+  font-size: 15px;
+  color: var(--nileair-navy);
+}
+
+.booking-widget-trip-list li:hover {
+  background: #f4f4f4;
+}
+
+.booking-widget-search {
+  appearance: none;
+  border: 0;
+  background: var(--nileair-gold);
+  color: #fff;
+  border-radius: 10px;
+  width: 56px;
+  flex: 0 0 auto;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.booking-widget-search svg {
+  width: 22px;
+  height: 22px;
+}
+
+.booking-widget-search:hover {
+  background: rgb(176 156 104);
+}
+
+/* ===== options row ===== */
+.booking-widget-options {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 0 16px 18px;
+  font-size: 14px;
+  color: #6b7688;
+}
+
+.booking-widget-options-label {
+  font-weight: 600;
+  color: var(--nileair-navy);
+}
+
+.booking-widget-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+/* ===== responsive ===== */
+@media (width < 900px) {
+  .section.booking-widget-container {
+    margin-bottom: 0;
+    transform: none;
+  }
+
+  .booking-widget-form {
+    flex-direction: column;
+  }
+
+  .booking-widget-airport,
+  .booking-widget-trip,
+  .booking-widget-field,
+  .booking-widget-search {
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
+    box-sizing: border-box;
+  }
+
+  .booking-widget-swap {
+    align-self: center;
+    transform: rotate(90deg);
+  }
+
+  .booking-widget-tab {
+    font-size: 14px;
+    padding: 12px;
+  }
+}
