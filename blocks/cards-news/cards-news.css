@@ -58,7 +58,7 @@
 }
 
 .cards-news .cards-news-card-body h3 a:hover {
-  color: var(--link-color);
+  color: var(--link-hover-color);
   text-decoration: none;
 }
 
