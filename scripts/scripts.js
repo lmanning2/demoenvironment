@@ -98,10 +98,16 @@ function buildBookingWidget(main) {
 function buildPageHero(main) {
   if (main !== document.querySelector('main')) return;
   const sections = [...main.querySelectorAll(':scope > div')];
-  // title section = first section (after any prepended widget) that has a
-  // heading together with an image.
-  const titleSection = sections.find((s) => s.querySelector('h1, h2, h3, h4')
-    && s.querySelector('picture, img'));
+  // Interior page-title section = a plain default-content section (single
+  // heading + banner image, no authored block). This deliberately excludes
+  // the homepage, whose opening section is a carousel-hero block (a div with a
+  // block class and multiple headings) — turning that into a page-hero band
+  // was a regression.
+  const titleSection = sections.find((s) => {
+    if (s.querySelector('div[class]')) return false; // contains an authored block
+    const headings = s.querySelectorAll('h1, h2, h3, h4');
+    return headings.length === 1 && s.querySelector('picture, img');
+  });
   if (!titleSection) return;
 
   const isCover = (pic) => pic.querySelector('img[alt="cover" i]');
