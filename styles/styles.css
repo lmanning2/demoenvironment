@@ -343,6 +343,20 @@ main .section.page-hero {
   overflow: hidden;
 }
 
+/* the full-width cover banner right after the page-hero band sits flush
+   against it (no section gap, no paragraph margin around the image). */
+main .section.page-hero + .section {
+  margin-top: 0;
+}
+
+main .section.page-hero + .section > .default-content-wrapper:first-child {
+  margin-top: 0;
+}
+
+main .section.page-hero + .section > .default-content-wrapper:first-child > p:first-child {
+  margin-top: 0;
+}
+
 main .section.page-hero > div {
   position: relative;
   display: flex;
