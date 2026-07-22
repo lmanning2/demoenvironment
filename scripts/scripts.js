@@ -104,24 +104,29 @@ function buildPageHero(main) {
     && s.querySelector('picture, img'));
   if (!titleSection) return;
 
-  // if the next section is image-only (a cover banner with no other content),
-  // fold its image into the title section so both share one navy band.
+  const isCover = (pic) => pic.querySelector('img[alt="cover" i]');
   const next = titleSection.nextElementSibling;
+
   if (next) {
+    const nextCover = [...next.querySelectorAll('picture')].find(isCover);
     const hasOtherContent = next.querySelector('h1, h2, h3, h4, table, ul, ol')
       || [...next.querySelectorAll('p')].some((p) => p.textContent.trim() && !p.querySelector('picture, img'));
-    const nextImg = next.querySelector('picture');
-    if (nextImg && !hasOtherContent) {
-      titleSection.append(nextImg.closest('p') || nextImg);
+    if (nextCover && !hasOtherContent) {
+      // next section is image-only: fold the whole thing into the band.
+      titleSection.append(nextCover.closest('p') || nextCover);
       next.remove();
+    } else if (nextCover) {
+      // next section also has text/headings: lift only the cover image up so
+      // it blends into the band, leaving the rest of that section in place.
+      titleSection.append(nextCover.closest('p') || nextCover);
     }
   }
 
   // prefer the alt="cover" banner as the blended image; drop any extra
-  // decorative image so only one shows on the right.
+  // decorative image (e.g. a thin banner strip) so only one shows on the right.
   const pictures = [...titleSection.querySelectorAll('picture')];
   if (pictures.length > 1) {
-    const cover = pictures.find((pic) => pic.querySelector('img[alt="cover" i]')) || pictures[pictures.length - 1];
+    const cover = pictures.find(isCover) || pictures[pictures.length - 1];
     pictures.forEach((pic) => {
       if (pic !== cover) (pic.closest('p') || pic).remove();
     });
