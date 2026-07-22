@@ -330,42 +330,57 @@ main > .section:first-of-type {
   }
 }
 
-/* page-hero band: navy strip under the booking widget with the page title on
-   the left and the cover image blended into the navy on the right (matches
-   nileair.com interior page headers). */
+/* page-hero band: a compact navy strip under the booking widget with the page
+   title on the left and a thin decorative banner image tucked into the
+   top-right corner, blended into the navy (matches nileair.com interior page
+   headers). A separate full-width cover image renders below as a normal
+   banner. */
 main .section.page-hero {
+  position: relative;
   background-color: var(--nileair-navy, rgb(22 40 68));
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
 
 main .section.page-hero > div {
-  display: grid;
-  grid-template-columns: 1fr;
+  position: relative;
+  display: flex;
   align-items: center;
-  gap: 0;
+  height: 120px;
+  max-width: none;
+  margin: 0;
   padding: 0 24px;
-  min-height: 130px;
 }
 
 main .section.page-hero h1,
 main .section.page-hero h2,
 main .section.page-hero h3 {
   color: #fff;
-  margin: 24px 0;
-  grid-row: 1;
-  grid-column: 1;
-  z-index: 1;
-}
-
-main .section.page-hero p {
   margin: 0;
-  grid-row: 1;
-  grid-column: 1;
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin-inline: auto;
+  width: 100%;
+  padding-inline: 0;
 }
 
-main .section.page-hero picture,
-main .section.page-hero img {
+/* the decorative strip: pinned to the right edge of the band, clipped to the
+   band height, fading into the navy on its left edge. */
+main .section.page-hero p {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 55%;
+  margin: 0;
+  overflow: hidden;
+  mask-image: linear-gradient(90deg, transparent 0%, #000 50%);
+}
+
+main .section.page-hero p picture,
+main .section.page-hero p img {
   display: block;
   width: 100%;
   height: 100%;
@@ -374,33 +389,12 @@ main .section.page-hero img {
 
 @media (width >= 900px) {
   main .section.page-hero > div {
-    grid-template-columns: 1fr 1fr;
-    min-height: 160px;
+    height: 150px;
     padding: 0 32px;
   }
 
-  /* cap the blended image height so the band stays compact instead of the
-     tall image stretching the whole navy strip. */
-  main .section.page-hero p:has(picture) img,
-  main .section.page-hero p:has(img) img {
-    height: 160px;
-  }
-
-  main .section.page-hero h1,
-  main .section.page-hero h2,
-  main .section.page-hero h3 {
-    grid-column: 1;
-  }
-
-  /* cover image occupies the right column and fades into the navy on its
-     left edge so it reads as blended into the band. */
-  main .section.page-hero p:has(picture),
-  main .section.page-hero p:has(img) {
-    grid-row: 1;
-    grid-column: 2;
-    align-self: stretch;
-    position: relative;
-    mask-image: linear-gradient(90deg, transparent 0%, rgb(0 0 0 / 55%) 22%, #000 55%);
+  main .section.page-hero p {
+    width: 50%;
   }
 }
 
