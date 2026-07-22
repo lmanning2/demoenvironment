@@ -345,7 +345,7 @@ main .section.page-hero > div {
   align-items: center;
   gap: 0;
   padding: 0 24px;
-  min-height: 200px;
+  min-height: 130px;
 }
 
 main .section.page-hero h1,
@@ -375,8 +375,15 @@ main .section.page-hero img {
 @media (width >= 900px) {
   main .section.page-hero > div {
     grid-template-columns: 1fr 1fr;
-    min-height: 240px;
+    min-height: 160px;
     padding: 0 32px;
+  }
+
+  /* cap the blended image height so the band stays compact instead of the
+     tall image stretching the whole navy strip. */
+  main .section.page-hero p:has(picture) img,
+  main .section.page-hero p:has(img) img {
+    height: 160px;
   }
 
   main .section.page-hero h1,
