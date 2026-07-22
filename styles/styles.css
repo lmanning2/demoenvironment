@@ -347,7 +347,7 @@ main .section.page-hero > div {
   position: relative;
   display: flex;
   align-items: center;
-  height: 120px;
+  height: 72px;
   max-width: none;
   margin: 0;
   padding: 0 24px;
@@ -389,7 +389,7 @@ main .section.page-hero p img {
 
 @media (width >= 900px) {
   main .section.page-hero > div {
-    height: 150px;
+    height: 90px;
     padding: 0 32px;
   }
 
