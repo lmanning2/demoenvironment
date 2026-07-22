@@ -105,7 +105,7 @@ footer .footer-column h4 {
   cursor: pointer;
 }
 
-/* chevron on mobile accordion titles */
+/* chevron on accordion titles */
 footer .footer-column h4::after {
   content: '';
   position: absolute;
@@ -172,34 +172,53 @@ footer .footer-bottom p {
   font-size: 13px;
 }
 
-/* ===== DESKTOP (>= 900px): columns open, no accordion ===== */
+/* ===== DESKTOP (>= 900px): centered collapsible dropdown columns ===== */
 @media (width >= 900px) {
   footer .footer-brand {
     padding: 40px 32px 8px;
+    text-align: center;
+  }
+
+  footer .footer-brand p {
+    line-height: 0;
+  }
+
+  footer .footer-brand img {
+    display: inline-block;
   }
 
   footer .footer-columns {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0 40px;
+    grid-template-columns: repeat(4, auto);
+    justify-content: center;
+    gap: 0 64px;
     padding: 8px 32px 32px;
+    align-items: start;
   }
 
+  /* title + chevron centered, chevron sits below the label */
   footer .footer-column h4 {
-    border-bottom: 2px solid var(--nileair-gold);
-    padding: 0 0 10px;
-    margin-bottom: 12px;
-    cursor: default;
+    border-bottom: 0;
+    padding: 0 0 24px;
+    margin: 0;
     font-size: 16px;
+    text-align: center;
   }
 
   footer .footer-column h4::after {
-    display: none;
+    top: unset;
+    right: unset;
+    bottom: 6px;
+    left: 50%;
+    margin-left: -4px;
   }
 
+  footer .footer-column h4[aria-expanded='true']::after {
+    bottom: 2px;
+  }
+
+  /* collapsed by default on desktop too; expands on click */
   footer .footer-column ul {
-    max-height: none;
-    overflow: visible;
-    padding: 0;
+    text-align: center;
   }
 
   footer .footer-bottom {
