@@ -103,17 +103,20 @@ function buildPageHero(main) {
   // the homepage, whose opening section is a carousel-hero block (a div with a
   // block class and multiple headings) — turning that into a page-hero band
   // was a regression.
-  const titleSection = sections.find((s) => {
-    if (s.querySelector('div[class]')) return false; // contains an authored block
-    const headings = s.querySelectorAll('h1, h2, h3, h4');
-    return headings.length === 1 && s.querySelector('picture, img');
-  });
-  if (!titleSection) return;
+  // Only consider the first content section (after the prepended booking
+  // widget). The title section is a plain default-content section whose only
+  // heading is the page title. It may or may not include a banner image.
+  const first = sections.find((s) => !s.querySelector('.booking-widget'));
+  if (!first) return;
+  const headings = first.querySelectorAll('h1, h2, h3, h4');
+  const isPlain = !first.querySelector('div[class]'); // no authored block
+  if (!isPlain || headings.length !== 1) return;
+  const titleSection = first;
 
-  // The title section's own image is a thin decorative banner strip that the
-  // source tucks into the top-right corner of the navy band. Keep only that
-  // one image; leave any separate full-width cover (alt="cover") image in its
-  // own section below to render as a normal full-bleed banner.
+  // If the title section includes a thin decorative banner strip, the source
+  // tucks it into the top-right corner of the navy band; keep only the first
+  // such image. A separate full-width cover (alt="cover") image, if any, stays
+  // in its own section below to render as a normal full-bleed banner.
   const pictures = [...titleSection.querySelectorAll('picture')];
   if (pictures.length > 1) {
     pictures.slice(1).forEach((pic) => (pic.closest('p') || pic).remove());
