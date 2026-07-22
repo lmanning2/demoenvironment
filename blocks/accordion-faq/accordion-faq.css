@@ -46,7 +46,7 @@
 }
 
 .accordion-faq .accordion-faq-item-label:hover {
-  color: var(--link-color);
+  color: var(--link-hover-color);
 }
 
 /* chevron indicator drawn with CSS (down when closed, up when open) */
