@@ -330,6 +330,73 @@ main > .section:first-of-type {
   }
 }
 
+/* page-hero band: navy strip under the booking widget with the page title on
+   the left and the cover image blended into the navy on the right (matches
+   nileair.com interior page headers). */
+main .section.page-hero {
+  background-color: var(--nileair-navy, rgb(22 40 68));
+  margin: 0;
+  padding: 0;
+}
+
+main .section.page-hero > div {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  gap: 0;
+  padding: 0 24px;
+  min-height: 200px;
+}
+
+main .section.page-hero h1,
+main .section.page-hero h2,
+main .section.page-hero h3 {
+  color: #fff;
+  margin: 24px 0;
+  grid-row: 1;
+  grid-column: 1;
+  z-index: 1;
+}
+
+main .section.page-hero p {
+  margin: 0;
+  grid-row: 1;
+  grid-column: 1;
+}
+
+main .section.page-hero picture,
+main .section.page-hero img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (width >= 900px) {
+  main .section.page-hero > div {
+    grid-template-columns: 1fr 1fr;
+    min-height: 240px;
+    padding: 0 32px;
+  }
+
+  main .section.page-hero h1,
+  main .section.page-hero h2,
+  main .section.page-hero h3 {
+    grid-column: 1;
+  }
+
+  /* cover image occupies the right column and fades into the navy on its
+     left edge so it reads as blended into the band. */
+  main .section.page-hero p:has(picture),
+  main .section.page-hero p:has(img) {
+    grid-row: 1;
+    grid-column: 2;
+    align-self: stretch;
+    position: relative;
+    mask-image: linear-gradient(90deg, transparent 0%, rgb(0 0 0 / 55%) 22%, #000 55%);
+  }
+}
+
 /* section metadata */
 main .section.light,
 main .section.highlight {

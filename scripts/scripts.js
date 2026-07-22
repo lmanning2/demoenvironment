@@ -89,12 +89,55 @@ function buildBookingWidget(main) {
 }
 
 /**
+ * Interior content pages open with a page title + banner image. Match the
+ * source design by turning that opening section into a navy "page-hero" band
+ * with the title on the left and the banner image blended into the navy on the
+ * right. Runs before decorateSections so it operates on the raw section divs.
+ * @param {Element} main The container element
+ */
+function buildPageHero(main) {
+  if (main !== document.querySelector('main')) return;
+  const sections = [...main.querySelectorAll(':scope > div')];
+  // title section = first section (after any prepended widget) that has a
+  // heading together with an image.
+  const titleSection = sections.find((s) => s.querySelector('h1, h2, h3, h4')
+    && s.querySelector('picture, img'));
+  if (!titleSection) return;
+
+  // if the next section is image-only (a cover banner with no other content),
+  // fold its image into the title section so both share one navy band.
+  const next = titleSection.nextElementSibling;
+  if (next) {
+    const hasOtherContent = next.querySelector('h1, h2, h3, h4, table, ul, ol')
+      || [...next.querySelectorAll('p')].some((p) => p.textContent.trim() && !p.querySelector('picture, img'));
+    const nextImg = next.querySelector('picture');
+    if (nextImg && !hasOtherContent) {
+      titleSection.append(nextImg.closest('p') || nextImg);
+      next.remove();
+    }
+  }
+
+  // prefer the alt="cover" banner as the blended image; drop any extra
+  // decorative image so only one shows on the right.
+  const pictures = [...titleSection.querySelectorAll('picture')];
+  if (pictures.length > 1) {
+    const cover = pictures.find((pic) => pic.querySelector('img[alt="cover" i]')) || pictures[pictures.length - 1];
+    pictures.forEach((pic) => {
+      if (pic !== cover) (pic.closest('p') || pic).remove();
+    });
+  }
+
+  titleSection.classList.add('page-hero');
+}
+
+/**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
  */
 function buildAutoBlocks(main) {
   try {
     buildBookingWidget(main);
+    buildPageHero(main);
     // auto load `*/fragments/*` references
     const fragments = [...main.querySelectorAll('a[href*="/fragments/"]')].filter((f) => !f.closest('.fragment'));
     if (fragments.length > 0) {
