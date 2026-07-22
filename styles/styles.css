@@ -353,6 +353,7 @@ main .section.page-hero + .section > .default-content-wrapper:first-child {
   margin-top: 0;
 }
 
+/* stylelint-disable-next-line no-descending-specificity */
 main .section.page-hero + .section > .default-content-wrapper:first-child > p:first-child {
   margin-top: 0;
 }
