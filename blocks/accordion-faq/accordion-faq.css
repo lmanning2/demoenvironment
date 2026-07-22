@@ -1,0 +1,125 @@
+/*
+ * Accordion FAQ block
+ * Migrated from nileair.com FAQ accordions.
+ * Card design (light background, rounded corners, subtle shadow, chevron
+ * indicator) so cards read correctly on both grey and white section
+ * backgrounds. Values extracted from the original .accordion-item cards.
+ */
+
+.accordion-faq {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.accordion-faq .accordion-faq-item {
+  background-color: rgb(247 248 249);
+  border: 0;
+  border-radius: 6px;
+  box-shadow: 0 1px 2px 0 rgb(85 105 135 / 10%);
+  overflow: hidden;
+}
+
+/* question / summary */
+.accordion-faq .accordion-faq-item-label {
+  position: relative;
+  display: block;
+  margin: 0;
+  padding: 20px 52px 20px 20px;
+  color: var(--text-color);
+  font-family: var(--heading-font-family);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: left;
+  cursor: pointer;
+  list-style: none;
+  transition: color 0.2s;
+}
+
+.accordion-faq .accordion-faq-item-label::-webkit-details-marker {
+  display: none;
+}
+
+.accordion-faq .accordion-faq-item-label p {
+  margin: 0;
+}
+
+.accordion-faq .accordion-faq-item-label:hover {
+  color: var(--link-color);
+}
+
+/* chevron indicator drawn with CSS (down when closed, up when open) */
+.accordion-faq .accordion-faq-item-label::after {
+  content: '';
+  position: absolute;
+  top: 26px;
+  right: 22px;
+  width: 10px;
+  height: 10px;
+  border: solid currentcolor;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+  transition: transform 0.2s;
+}
+
+.accordion-faq .accordion-faq-item[open] .accordion-faq-item-label::after {
+  transform: rotate(-135deg);
+}
+
+.accordion-faq .accordion-faq-item[open] .accordion-faq-item-label {
+  color: var(--link-color);
+}
+
+/* answer / body */
+.accordion-faq .accordion-faq-item-body {
+  padding: 0 20px 20px;
+  color: var(--text-color);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.accordion-faq .accordion-faq-item-body p {
+  margin: 0 0 0.8em;
+}
+
+.accordion-faq .accordion-faq-item-body p:last-child {
+  margin-bottom: 0;
+}
+
+.accordion-faq .accordion-faq-item-body ul,
+.accordion-faq .accordion-faq-item-body ol {
+  margin: 0 0 0.8em;
+  padding-left: 20px;
+}
+
+.accordion-faq .accordion-faq-item-body li {
+  margin-bottom: 0.4em;
+}
+
+.accordion-faq .accordion-faq-item-body a {
+  color: var(--link-color);
+  text-decoration: underline;
+}
+
+/* tablet and up: roomier padding and slightly larger question type */
+@media (width >= 900px) {
+  .accordion-faq {
+    gap: 24px;
+  }
+
+  .accordion-faq .accordion-faq-item-label {
+    padding: 26px 60px 26px 30px;
+    font-size: 20px;
+  }
+
+  .accordion-faq .accordion-faq-item-label::after {
+    top: 32px;
+    right: 30px;
+  }
+
+  .accordion-faq .accordion-faq-item-body {
+    padding: 0 30px 26px;
+    font-size: 18px;
+  }
+}

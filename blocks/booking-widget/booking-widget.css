@@ -1,0 +1,279 @@
+/* stylelint-disable no-descending-specificity */
+
+:root {
+  --nileair-navy: rgb(22 40 68);
+  --nileair-gold: rgb(196 175 121);
+}
+
+/* the widget sits on the navy band directly under the header; the desktop
+   header renders a two-tier bar (~128px) that overflows into main, so pad the
+   widget down to clear it. */
+.section.booking-widget-container {
+  background: var(--nileair-navy);
+  padding: 72px 0 32px;
+  margin: 0;
+}
+
+main > .section.booking-widget-container > .booking-widget-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.booking-widget {
+  color: #fff;
+}
+
+.booking-widget-inner {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== tab strip ===== */
+.booking-widget-tabs {
+  display: flex;
+  gap: 32px;
+  border-bottom: 1px solid rgb(255 255 255 / 15%);
+  margin-bottom: 28px;
+}
+
+.booking-widget-tab {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: rgb(255 255 255 / 55%);
+  font-size: 22px;
+  font-weight: 500;
+  padding: 12px 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+}
+
+.booking-widget-tab-icon {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+}
+
+.booking-widget-tab-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.booking-widget-tab.active {
+  color: #fff;
+  border-bottom-color: var(--nileair-gold);
+}
+
+.booking-widget-tab:hover {
+  color: #fff;
+}
+
+/* ===== search form ===== */
+.booking-widget-form {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 32px;
+}
+
+/* airport From/To — big code over small city, no box */
+.booking-widget-airport {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+  padding: 0;
+}
+
+.booking-widget-code {
+  font-size: 46px;
+  font-weight: 400;
+  line-height: 1;
+  color: #fff;
+}
+
+.booking-widget-city {
+  font-size: 15px;
+  color: rgb(255 255 255 / 75%);
+  margin-top: 6px;
+}
+
+/* the double-arrow between From and To */
+.booking-widget-swap {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 34px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+  align-self: flex-start;
+  margin-top: 18px;
+}
+
+/* trip type + dates + passengers — underline fields */
+.booking-widget-trip,
+.booking-widget-field {
+  border: 0;
+  border-bottom: 1px solid rgb(255 255 255 / 40%);
+  padding: 0 0 10px;
+  min-width: 200px;
+  flex: 1 1 200px;
+  position: relative;
+  cursor: pointer;
+  color: #fff;
+  align-self: flex-start;
+  margin-top: 14px;
+}
+
+.booking-widget-value,
+.booking-widget-trip-current {
+  font-size: 22px;
+  font-weight: 500;
+  color: #fff;
+}
+
+/* caret on trip + passengers */
+.booking-widget-trip::after,
+.booking-widget-pax::after {
+  content: '';
+  position: absolute;
+  right: 4px;
+  top: 6px;
+  width: 9px;
+  height: 9px;
+  border: 2px solid rgb(255 255 255 / 80%);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.booking-widget-trip-list {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 8px 0 0;
+  padding: 6px 0;
+  list-style: none;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgb(0 0 0 / 25%);
+  z-index: 10;
+}
+
+.booking-widget-trip.open .booking-widget-trip-list {
+  display: block;
+}
+
+.booking-widget-trip-list li {
+  padding: 8px 18px;
+  font-size: 15px;
+  color: var(--nileair-navy);
+}
+
+.booking-widget-trip-list li:hover {
+  background: #f4f4f4;
+}
+
+/* gold circular search button */
+.booking-widget-search {
+  appearance: none;
+  border: 0;
+  background: var(--nileair-gold);
+  color: #fff;
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  flex: 0 0 auto;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+}
+
+.booking-widget-search svg {
+  width: 26px;
+  height: 26px;
+}
+
+.booking-widget-search:hover {
+  background: rgb(176 156 104);
+}
+
+/* ===== options row ===== */
+.booking-widget-options {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-top: 22px;
+  font-size: 15px;
+  color: rgb(255 255 255 / 85%);
+}
+
+.booking-widget-options-label {
+  font-weight: 500;
+}
+
+.booking-widget-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+/* ===== responsive ===== */
+@media (width < 900px) {
+  .section.booking-widget-container {
+    padding: 24px 0;
+  }
+
+  .booking-widget-tabs {
+    gap: 16px;
+  }
+
+  .booking-widget-tab {
+    font-size: 16px;
+  }
+
+  .booking-widget-form {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 20px;
+  }
+
+  .booking-widget-airport,
+  .booking-widget-trip,
+  .booking-widget-field {
+    width: 100%;
+    min-width: 0;
+    flex: 1 1 auto;
+    margin-top: 0;
+    box-sizing: border-box;
+  }
+
+  .booking-widget-code {
+    font-size: 34px;
+  }
+
+  .booking-widget-swap {
+    align-self: center;
+    margin: 0;
+    transform: rotate(90deg);
+  }
+
+  .booking-widget-search {
+    margin: 4px auto 0;
+  }
+}

@@ -1,0 +1,165 @@
+/* Block: cards-quicklink
+ * Two variants share one block class, distinguished structurally:
+ *  - Base rules      -> feature strip (icon beside bold link, light band, 6 across)
+ *  - Preceded by a heading (.default-content-wrapper + wrapper) -> "why choose" grid
+ *    (icon above centered label, transparent, 2/3/6 responsive columns)
+ * Values extracted from nileair.com computed styles.
+ */
+
+.cards-quicklink {
+  --cq-navy: rgb(22 40 68);
+  --cq-heading: rgb(15 28 49);
+}
+
+/* ============================================================
+   FEATURE STRIP (base variant: .feature-area / .single-feature)
+   ============================================================ */
+
+/* Light band behind the feature strip (first block in its section) */
+.cards-quicklink-wrapper:first-child {
+  background-color: rgb(246 247 249);
+  padding: 32px 0;
+}
+
+.cards-quicklink > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px 12px;
+}
+
+.cards-quicklink > ul > li {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  background-color: transparent;
+  border: 0;
+}
+
+.cards-quicklink .cards-quicklink-card-image {
+  line-height: 0;
+  flex: 0 0 auto;
+}
+
+.cards-quicklink .cards-quicklink-card-image img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+}
+
+.cards-quicklink .cards-quicklink-card-body {
+  margin: 0;
+}
+
+.cards-quicklink .cards-quicklink-card-body h4 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--cq-navy);
+}
+
+.cards-quicklink .cards-quicklink-card-body h4 a:any-link {
+  color: var(--cq-navy);
+  font-size: inherit;
+  font-weight: inherit;
+  text-decoration: none;
+}
+
+.cards-quicklink .cards-quicklink-card-body h4 a:hover {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
+/* ============================================================
+   WHY-CHOOSE GRID (variant: block follows a heading in-section)
+   ============================================================ */
+
+/* the heading above the grid, centered like the original section-title */
+.cards-quicklink-wrapper:not(:first-child) {
+  padding: 24px 0;
+}
+
+.default-content-wrapper + .cards-quicklink-wrapper {
+  padding-top: 8px;
+}
+
+/* Center the preceding section heading (Why choose Nile Air?) */
+.default-content-wrapper:has(+ .cards-quicklink-wrapper) {
+  text-align: center;
+}
+
+.default-content-wrapper:has(+ .cards-quicklink-wrapper) h1,
+.default-content-wrapper:has(+ .cards-quicklink-wrapper) h2 {
+  text-align: center;
+  color: var(--cq-navy);
+  font-weight: 700;
+}
+
+/* the grid itself: icon above centered label */
+.default-content-wrapper + .cards-quicklink-wrapper .cards-quicklink > ul {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px 12px;
+}
+
+.default-content-wrapper + .cards-quicklink-wrapper .cards-quicklink > ul > li {
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 15px;
+}
+
+.default-content-wrapper + .cards-quicklink-wrapper
+  .cards-quicklink .cards-quicklink-card-image img {
+  width: 60px;
+  height: 56px;
+  object-fit: contain;
+}
+
+.default-content-wrapper + .cards-quicklink-wrapper
+  .cards-quicklink .cards-quicklink-card-body {
+  margin: 0;
+}
+
+.default-content-wrapper + .cards-quicklink-wrapper
+  .cards-quicklink .cards-quicklink-card-body h4 {
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--cq-navy);
+}
+
+.default-content-wrapper + .cards-quicklink-wrapper
+  .cards-quicklink .cards-quicklink-card-body h4 a:any-link {
+  color: var(--cq-navy);
+  font-weight: 600;
+}
+
+/* ============================================================
+   RESPONSIVE — tablet 3 across, desktop 6 across
+   ============================================================ */
+
+@media (width >= 600px) {
+  .default-content-wrapper + .cards-quicklink-wrapper .cards-quicklink > ul {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (width >= 900px) {
+  .cards-quicklink > ul {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 24px;
+  }
+
+  .cards-quicklink-wrapper:first-child {
+    padding: 50px 0;
+  }
+
+  .default-content-wrapper + .cards-quicklink-wrapper .cards-quicklink > ul {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 30px 12px;
+  }
+}
