@@ -110,32 +110,13 @@ function buildPageHero(main) {
   });
   if (!titleSection) return;
 
-  const isCover = (pic) => pic.querySelector('img[alt="cover" i]');
-  const next = titleSection.nextElementSibling;
-
-  if (next) {
-    const nextCover = [...next.querySelectorAll('picture')].find(isCover);
-    const hasOtherContent = next.querySelector('h1, h2, h3, h4, table, ul, ol')
-      || [...next.querySelectorAll('p')].some((p) => p.textContent.trim() && !p.querySelector('picture, img'));
-    if (nextCover && !hasOtherContent) {
-      // next section is image-only: fold the whole thing into the band.
-      titleSection.append(nextCover.closest('p') || nextCover);
-      next.remove();
-    } else if (nextCover) {
-      // next section also has text/headings: lift only the cover image up so
-      // it blends into the band, leaving the rest of that section in place.
-      titleSection.append(nextCover.closest('p') || nextCover);
-    }
-  }
-
-  // prefer the alt="cover" banner as the blended image; drop any extra
-  // decorative image (e.g. a thin banner strip) so only one shows on the right.
+  // The title section's own image is a thin decorative banner strip that the
+  // source tucks into the top-right corner of the navy band. Keep only that
+  // one image; leave any separate full-width cover (alt="cover") image in its
+  // own section below to render as a normal full-bleed banner.
   const pictures = [...titleSection.querySelectorAll('picture')];
   if (pictures.length > 1) {
-    const cover = pictures.find(isCover) || pictures[pictures.length - 1];
-    pictures.forEach((pic) => {
-      if (pic !== cover) (pic.closest('p') || pic).remove();
-    });
+    pictures.slice(1).forEach((pic) => (pic.closest('p') || pic).remove());
   }
 
   titleSection.classList.add('page-hero');
