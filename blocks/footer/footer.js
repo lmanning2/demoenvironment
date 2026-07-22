@@ -39,25 +39,38 @@ export default async function decorate(block) {
   if (brand) brand.classList.add('footer-brand');
 
   // Accordion columns: the section that holds the <h4>-titled link groups.
+  // DA sometimes flattens the per-column wrapper divs into a single
+  // default-content-wrapper, so rebuild one .footer-column per <h4>+<ul>
+  // pair rather than relying on the child structure.
   const columnsSection = sections.find((s) => s.querySelector('h4'));
   if (columnsSection) {
     columnsSection.classList.add('footer-columns');
-    [...columnsSection.children].forEach((col) => {
-      col.classList.add('footer-column');
-      const heading = col.querySelector('h4');
-      const list = col.querySelector('ul');
-      if (heading && list) {
-        heading.setAttribute('role', 'button');
-        heading.setAttribute('tabindex', '0');
-        heading.setAttribute('aria-expanded', 'false');
-        const toggle = () => {
-          const expanded = heading.getAttribute('aria-expanded') === 'true';
-          heading.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-        };
-        heading.addEventListener('click', toggle);
-        heading.addEventListener('keydown', (e) => {
-          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
-        });
+    const headings = [...columnsSection.querySelectorAll('h4')];
+    headings.forEach((heading) => {
+      const list = heading.nextElementSibling && heading.nextElementSibling.tagName === 'UL'
+        ? heading.nextElementSibling
+        : heading.parentElement.querySelector('ul');
+      const column = document.createElement('div');
+      column.className = 'footer-column';
+      columnsSection.append(column);
+      column.append(heading);
+      if (list) column.append(list);
+      heading.setAttribute('role', 'button');
+      heading.setAttribute('tabindex', '0');
+      heading.setAttribute('aria-expanded', 'false');
+      const toggle = () => {
+        const expanded = heading.getAttribute('aria-expanded') === 'true';
+        heading.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+      };
+      heading.addEventListener('click', toggle);
+      heading.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+      });
+    });
+    // remove now-empty original wrapper divs left behind after re-parenting
+    [...columnsSection.children].forEach((child) => {
+      if (!child.classList.contains('footer-column') && !child.querySelector('h4')) {
+        child.remove();
       }
     });
   }

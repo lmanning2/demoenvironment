@@ -13,6 +13,16 @@
   position: relative;
 }
 
+/* full-bleed: break the hero out of the 1200px content column so the
+   carousel spans the entire window width. */
+main > .section > .carousel-hero-wrapper {
+  max-width: none;
+  width: 100vw;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  padding: 0;
+}
+
 .carousel-hero .carousel-hero-slides-container {
   position: relative;
 }
