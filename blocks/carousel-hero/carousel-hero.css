@@ -55,7 +55,7 @@ main > .section > .carousel-hero-wrapper {
   justify-content: center;
   position: relative;
   width: 100%;
-  min-height: 320px;
+  min-height: 460px;
 
   /* fallback background color (original slide fallback) */
   background-color: rgb(246 247 249);
@@ -97,6 +97,15 @@ main > .section > .carousel-hero-wrapper {
   height: 100%;
   width: 100%;
   object-fit: cover;
+}
+
+/* left-side white scrim so the left-aligned navy headline stays legible
+   over the photographic slide backgrounds. */
+.carousel-hero .carousel-hero-slide .carousel-hero-slide-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, rgb(255 255 255 / 80%) 0%, rgb(255 255 255 / 55%) 30%, rgb(255 255 255 / 0%) 65%);
 }
 
 /* --- Slide content (left-aligned, in centered container) ----- */
