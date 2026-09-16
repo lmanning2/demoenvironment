@@ -10,6 +10,9 @@ import {
   loadSections,
   loadCSS,
   buildBlock,
+  readBlockConfig,
+  toClassName,
+  toCamelCase,
 } from './aem.js';
 
 if (window.trustedTypes && window.trustedTypes.createPolicy) {
@@ -74,21 +77,6 @@ function buildWidgetAutoBlocks(main) {
 }
 
 /**
- * Injects the static booking-widget block at the top of the homepage main,
- * overlapping the hero. Homepage only; safe to call on every page.
- * @param {Element} main The container element
- */
-function buildBookingWidget(main) {
-  // only the top-level page main, never fragments (e.g. the footer fragment,
-  // which also runs decorateMain and would otherwise get its own widget).
-  if (main !== document.querySelector('main')) return;
-  if (main.querySelector('.booking-widget')) return;
-  const section = document.createElement('div');
-  section.append(buildBlock('booking-widget', { elems: [] }));
-  main.prepend(section);
-}
-
-/**
  * Interior content pages open with a page title + banner image. Match the
  * source design by turning that opening section into a navy "page-hero" band
  * with the title on the left and the banner image blended into the navy on the
@@ -103,10 +91,9 @@ function buildPageHero(main) {
   // the homepage, whose opening section is a carousel-hero block (a div with a
   // block class and multiple headings) — turning that into a page-hero band
   // was a regression.
-  // Only consider the first content section (after the prepended booking
-  // widget). The title section is a plain default-content section whose only
+  // The title section is the first plain default-content section whose only
   // heading is the page title. It may or may not include a banner image.
-  const first = sections.find((s) => !s.querySelector('.booking-widget'));
+  const first = sections[0];
   if (!first) return;
   const headings = first.querySelectorAll('h1, h2, h3, h4');
   const isPlain = !first.querySelector('div[class]'); // no authored block
@@ -126,12 +113,50 @@ function buildPageHero(main) {
 }
 
 /**
+ * The Help & Support "Looking for answers" section is a two-column layout on the
+ * source: the FAQ accordion fills a wide left column, while the energy-saving-tips
+ * carousel and the "We are here to help" link panel stack in a narrow right column.
+ * The imported section is a flat list of default-content + block wrappers; group
+ * them into .faq-col-main (accordion + its intro) and .faq-col-side (everything
+ * after the accordion) so CSS can lay them out side by side. Runs after
+ * decorateSections, so it matches the wrapped block wrappers.
+ * @param {Element} main The container element
+ */
+function buildFaqTwoColumn(main) {
+  if (main !== document.querySelector('main')) return;
+  main.querySelectorAll(':scope > .section').forEach((section) => {
+    // Runs after decorateBlocks, so the per-block `<name>-wrapper` classes are
+    // present. Grouping must happen after block decoration — wrapping earlier
+    // would make the column wrappers look like blocks to decorateBlocks
+    // (`div.section > div > div`).
+    const accordion = section.querySelector(':scope > .accordion-faq-wrapper');
+    const carousel = section.querySelector(':scope > .carousel-tips-wrapper');
+    if (!accordion || !carousel) return;
+    if (section.querySelector(':scope > .faq-col-main')) return;
+
+    const children = [...section.children];
+    const accordionIdx = children.indexOf(accordion);
+
+    const mainCol = document.createElement('div');
+    mainCol.className = 'faq-col-main';
+    const sideCol = document.createElement('div');
+    sideCol.className = 'faq-col-side';
+
+    children.forEach((child, i) => {
+      (i <= accordionIdx ? mainCol : sideCol).append(child);
+    });
+
+    section.append(mainCol, sideCol);
+    section.classList.add('faq-two-column');
+  });
+}
+
+/**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
  */
 function buildAutoBlocks(main) {
   try {
-    buildBookingWidget(main);
     buildPageHero(main);
     // auto load `*/fragments/*` references
     const fragments = [...main.querySelectorAll('a[href*="/fragments/"]')].filter((f) => !f.closest('.fragment'));
@@ -155,6 +180,32 @@ function buildAutoBlocks(main) {
     // eslint-disable-next-line no-console
     console.error('Auto Blocking failed', error);
   }
+}
+
+/**
+ * Applies `.section-metadata` block config (e.g. style="dark") to its section.
+ * This project's aem.js ships a trimmed decorateSections that does not handle
+ * section metadata, so we process it here — reading the config, adding the
+ * style classes / data attributes to the section, and removing the block so it
+ * is not treated as a loadable block. Must run after decorateSections (which
+ * wraps the block) and before decorateBlocks (which would try to load it).
+ * @param {Element} main The container element
+ */
+function decorateSectionMetadata(main) {
+  main.querySelectorAll(':scope > .section').forEach((section) => {
+    const sectionMeta = section.querySelector('div.section-metadata');
+    if (!sectionMeta) return;
+    const meta = readBlockConfig(sectionMeta);
+    Object.keys(meta).forEach((key) => {
+      if (key === 'style') {
+        meta.style.split(',').map((style) => toClassName(style.trim()))
+          .forEach((style) => section.classList.add(style));
+      } else {
+        section.dataset[toCamelCase(key)] = meta[key];
+      }
+    });
+    (sectionMeta.parentElement || sectionMeta).remove();
+  });
 }
 
 /**
@@ -205,7 +256,9 @@ export function decorateMain(main) {
   decorateIcons(main);
   buildAutoBlocks(main);
   decorateSections(main);
+  decorateSectionMetadata(main);
   decorateBlocks(main);
+  buildFaqTwoColumn(main);
   decorateButtons(main);
 }
 

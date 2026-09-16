@@ -4,67 +4,112 @@
   },
   "templates": [
     {
-      "name": "home-landing",
+      "name": "help-and-support",
       "urls": [
-        "https://www.nileair.com/"
+        "https://taqadistribution.com/addc/en-us/business/help-and-support/certificates",
+        "https://taqadistribution.com/addc/en-us/residential/help-and-support/transfer-and-removal-of-electricity-services"
       ],
-      "representativeUrl": "https://www.nileair.com/",
-      "coverageGaps": [],
-      "description": "Home landing page: site header with primary nav, a flight-booking search widget (tabs: Flights / My Bookings / Flight Status), a hero image carousel with headline+CTA slides, a quick-links feature strip, a 'Why choose Nile Air?' benefits grid, a promotions carousel of fare cards, a news room section, an app-download banner, an FAQ accordion, a newsletter signup, plus social bar and footer.",
+      "representativeUrl": "https://taqadistribution.com/addc/en-us/business/help-and-support/certificates",
+      "description": "Help & Support interior page: an angled photographic page-intro hero, a 'Find Your Solution' section with quick-link certificate tiles, a 'Looking For Answers' section with an FAQ accordion plus an energy-saving-tips promo carousel and a help link panel, and a dark customer-support section with icon cards.",
       "blocks": [
-        { "name": "carousel-hero", "instances": ["div.slider_area.owl-carousel"] },
-        { "name": "cards-quicklink", "instances": ["div.feature-area.demo_bg", "div.choose-area .row"] },
-        { "name": "carousel-fare", "instances": ["div.promotions_area .promotions_slide"] },
-        { "name": "cards-news", "instances": ["div.container.news-room"] },
-        { "name": "columns-appbanner", "instances": ["div.app-area.max-bg"] },
-        { "name": "accordion-faq", "instances": ["div.faq-area.gray_bg"] },
-        { "name": "columns-newsletter", "instances": ["div.newsletter-area"] },
-        { "name": "section-faq", "instances": ["div.faq-area.gray_bg"], "section": "grey" }
-      ],
-      "sections": [
-        { "id": "rc4c1", "name": "Hero image carousel", "selector": "div.slider_area.owl-carousel", "style": null, "blocks": ["carousel-hero"], "defaultContent": [] },
-        { "id": "rc4c2", "name": "Quick-links feature strip", "selector": "div.feature-area.demo_bg", "style": null, "blocks": ["cards-quicklink"], "defaultContent": [] },
-        { "id": "rc4c3", "name": "Why choose Nile Air benefits grid", "selector": "div.choose-area.pb-4", "style": null, "blocks": ["cards-quicklink"], "defaultContent": ["div.choose-area .section-title"] },
-        { "id": "rc4c4", "name": "Promotions carousel", "selector": "div.promotions_area", "style": null, "blocks": ["carousel-fare"], "defaultContent": ["div.promotions_area h1", "div.promotions_area .more_btn"] },
-        { "id": "rc4c5", "name": "News Room", "selector": "div.container.news-room", "style": null, "blocks": ["cards-news"], "defaultContent": ["div.news-room h1", "div.news-room .more_btn"] },
-        { "id": "rc4c6", "name": "App-download banner", "selector": "div.app-area.max-bg", "style": null, "blocks": ["columns-appbanner"], "defaultContent": [] },
-        { "id": "rc4c7", "name": "FAQ accordion", "selector": "div.faq-area.gray_bg", "style": "grey", "blocks": ["accordion-faq"], "defaultContent": ["div.faq-area h2"] },
-        { "id": "rc4c8", "name": "Newsletter signup", "selector": "div.newsletter-area", "style": null, "blocks": ["columns-newsletter"], "defaultContent": ["div.newsletter-content"] }
-      ]
-    },
-    {
-      "name": "content-page",
-      "urls": [
-        "https://www.nileair.com/travelling-pets",
-        "https://www.nileair.com/baggage-allowance",
-        "https://www.nileair.com/nileair-holidays"
-      ],
-      "representativeUrl": "https://www.nileair.com/travelling-pets",
-      "coverageGaps": [
         {
-          "url": "https://www.nileair.com/baggage-allowance",
-          "sections": [
-            {
-              "sectionSignature": "s(s(5x1,s(,,,,,,,,)))",
-              "nodeMapId": "rc4c3"
-            }
+          "name": "hero-support",
+          "instances": [
+            "div[class*='headerFrame_herosection']"
+          ]
+        },
+        {
+          "name": "cards-quicklink",
+          "instances": [
+            "div[class*='customCarousel_container']"
+          ]
+        },
+        {
+          "name": "accordion-faq",
+          "instances": [
+            "div[class*='faqsection_faqContainer']"
+          ]
+        },
+        {
+          "name": "carousel-tips",
+          "instances": [
+            "div[class*='tipsCarousel_carousel']"
+          ]
+        },
+        {
+          "name": "cards-support",
+          "instances": [
+            "div[class*='customerSupport_subContainer']"
           ]
         }
       ],
-      "description": "Interior content page sharing a common layout: site header + booking widget, breadcrumbs, a page title, one or more rich-text sections (some with a cover image), optional data table (baggage), optional accordion / FAQ sections, and on some pages a contact form. Followed by social bar and footer.",
-      "blocks": [
-        { "name": "accordion-faq", "instances": ["div.faq-box-area", "#pets", "#travelling-with-pets-faqs", "#baggage-allowance-faqs", "#why-choose-nile-air-holidays", "#nileair-holidays-faqs"] },
-        { "name": "form-contact", "instances": ["#contact-us"] },
-        { "name": "table", "instances": ["div.pr-area-table table", "#layout-content table"] }
-      ],
       "sections": [
-        { "id": "rc4c1", "name": "Breadcrumb / page title", "selector": "#layout-content > div.bread-crumbs", "style": null, "blocks": [], "defaultContent": ["#layout-content > div.bread-crumbs"] },
-        { "id": "rc4c2", "name": "Intro rich-text with cover image", "selector": "#layout-content > div.page-wrapper:nth-of-type(2)", "style": null, "blocks": [], "defaultContent": ["#layout-content > div.page-wrapper:nth-of-type(2) .about-content"] },
-        { "id": "rc4c3", "name": "Rich-text / data table", "selector": "#layout-content > div.page-wrapper:nth-of-type(3)", "style": null, "blocks": [], "defaultContent": ["#layout-content > div.page-wrapper:nth-of-type(3)"] },
-        { "id": "rc4c4", "name": "Accordion section", "selector": "#layout-content > div.page-wrapper:nth-of-type(4)", "style": null, "blocks": ["accordion-faq"], "defaultContent": ["#layout-content > div.page-wrapper:nth-of-type(4) .about-content"] },
-        { "id": "rc4c5", "name": "Contact form", "selector": "#layout-content > div.page-wrapper:nth-of-type(5)", "style": null, "blocks": ["form-contact"], "defaultContent": [] },
-        { "id": "rc4c6", "name": "FAQ accordion", "selector": "#layout-content > div.page-wrapper:nth-of-type(6)", "style": null, "blocks": ["accordion-faq"], "defaultContent": ["#layout-content > div.page-wrapper:nth-of-type(6) .about-content"] }
-      ]
+        {
+          "id": "rc2",
+          "name": "Hero",
+          "selector": [
+            "div[class*='headerFrame_herosection']"
+          ],
+          "style": null,
+          "blocks": [
+            "hero-support"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "rc3",
+          "name": "Find Your Solution",
+          "selector": [
+            "div[class*='customCarousel_container']"
+          ],
+          "style": null,
+          "blocks": [
+            "cards-quicklink"
+          ],
+          "defaultContent": [
+            "div[class*='customCarousel_leftHeaderContainer']"
+          ]
+        },
+        {
+          "id": "rc4",
+          "name": "Looking For Answers",
+          "selector": [
+            "div[class*='faqPanel_container']"
+          ],
+          "style": null,
+          "blocks": [
+            "accordion-faq",
+            "carousel-tips"
+          ],
+          "defaultContent": [
+            "div[class*='faqsection_header']",
+            "div[class*='faqPanel_quickLinkPanel']"
+          ]
+        },
+        {
+          "id": "rc5",
+          "name": "Customer Support",
+          "selector": [
+            "div[class*='customerSupport_container']"
+          ],
+          "style": "dark",
+          "blocks": [
+            "cards-support"
+          ],
+          "defaultContent": []
+        }
+      ],
+      "urlPattern": "/addc/en-us/*"
+    },
+    {
+      "name": "residential",
+      "urls": [
+        "https://taqadistribution.com/addc/en-us/residential/overview"
+      ],
+      "representativeUrl": "https://taqadistribution.com/addc/en-us/residential/overview",
+      "description": "To be named in naming step",
+      "blocks": [],
+      "urlPattern": "/addc/en-us/residential/*"
     }
   ]
 }

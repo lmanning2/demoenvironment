@@ -133,10 +133,18 @@ export default async function decorate(block) {
     return el.querySelector('img') && links.length <= 1 && !el.querySelector('h1, h2, h3, h4, h5, h6');
   };
   const listItemCount = (el) => getTopLevelItems(el).length;
+  // A block whose items open sub-menus is the main nav even when another block
+  // has an equal (or greater) count of flat links (e.g. a utility bar).
+  const submenuCount = (el) => getTopLevelItems(el)
+    .filter((li) => li.querySelector(':scope > ul')).length;
 
   let navBrand = blocks.find(isBrandBlock);
   const remaining = blocks.filter((el) => el !== navBrand);
-  remaining.sort((a, b) => listItemCount(b) - listItemCount(a));
+  remaining.sort((a, b) => {
+    const bySub = submenuCount(b) - submenuCount(a);
+    if (bySub !== 0) return bySub;
+    return listItemCount(b) - listItemCount(a);
+  });
   let navSections = remaining[0];
   const navTools = remaining.find((el) => el !== navSections && getTopLevelList(el));
 
@@ -155,14 +163,25 @@ export default async function decorate(block) {
   // Main nav items: mark items with a sub-menu as mega-menu triggers.
   if (navSections) {
     getTopLevelItems(navSections).forEach((navSection) => {
-      const submenu = navSection.querySelector(':scope > ul');
+      const submenus = [...navSection.querySelectorAll(':scope > ul')];
+      const submenu = submenus[0];
       if (submenu) {
         navSection.classList.add('nav-drop');
         submenu.classList.add('nav-mega');
-        // A multi-column mega-menu has <li> children that each hold a <p> title
-        // plus a nested <ul> of links.
-        const isMega = [...submenu.children].some((li) => li.querySelector(':scope > ul'));
-        if (isMega) submenu.classList.add('nav-mega-columns');
+        // Wrap the dropdown lists in a mega-panel with a "Select a category"
+        // heading. The first <ul> is the category-tile grid; a second <ul> (if
+        // present) is the promo CTA row.
+        const panel = document.createElement('div');
+        panel.className = 'nav-mega-panel';
+        const heading = document.createElement('p');
+        heading.className = 'nav-mega-heading';
+        heading.textContent = 'Select a category for support';
+        submenu.parentElement.insertBefore(panel, submenu);
+        panel.append(heading);
+        submenus.forEach((ul, i) => {
+          panel.append(ul);
+          ul.classList.add(i === 0 ? 'nav-mega-tiles' : 'nav-mega-cta');
+        });
       }
       navSection.setAttribute('aria-expanded', 'false');
       navSection.addEventListener('click', (e) => {

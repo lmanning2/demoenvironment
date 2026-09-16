@@ -1,23 +1,94 @@
 /*
- * Accordion Block
- * Recreate an accordion
- * https://www.hlx.live/developer/block-collection/accordion
+ * Accordion FAQ Block
+ * Collapsible question/answer list with optional category filter pills and
+ * "LOAD MORE" pagination.
+ *
+ * Authored structure (one row per question):
+ *   cell 0: question label
+ *   cell 1: answer body
+ *   cell 2: (optional) category name — when present on any row, a filter bar
+ *           of "All" + each unique category is rendered above the list.
  */
 
+const PAGE_SIZE = 4;
+
 export default function decorate(block) {
-  [...block.children].forEach((row) => {
-    // decorate accordion item label
+  // Build the <details> items from the authored rows.
+  const items = [...block.children].map((row) => {
     const label = row.children[0];
+    const bodyCell = row.children[1];
+    const categoryCell = row.children[2];
+    const category = categoryCell ? categoryCell.textContent.trim() : '';
+
     const summary = document.createElement('summary');
     summary.className = 'accordion-faq-item-label';
-    summary.append(...label.childNodes);
-    // decorate accordion item body
-    const body = row.children[1];
+    if (label) summary.append(...label.childNodes);
+
+    const body = bodyCell || document.createElement('div');
     body.className = 'accordion-faq-item-body';
-    // decorate accordion item
+
     const details = document.createElement('details');
     details.className = 'accordion-faq-item';
+    if (category) details.dataset.category = category;
     details.append(summary, body);
-    row.replaceWith(details);
+    return details;
   });
+
+  block.textContent = '';
+
+  const categories = [...new Set(items.map((it) => it.dataset.category).filter(Boolean))];
+  let activeCategory = 'all';
+  let visibleCount = PAGE_SIZE;
+
+  const list = document.createElement('div');
+  list.className = 'accordion-faq-list';
+  items.forEach((it) => list.append(it));
+
+  const loadMore = document.createElement('button');
+  loadMore.type = 'button';
+  loadMore.className = 'accordion-faq-load-more';
+  loadMore.textContent = 'LOAD MORE';
+
+  const render = () => {
+    const matches = items.filter(
+      (it) => activeCategory === 'all' || it.dataset.category === activeCategory,
+    );
+    items.forEach((it) => { it.hidden = true; });
+    matches.slice(0, visibleCount).forEach((it) => { it.hidden = false; });
+    loadMore.hidden = matches.length <= visibleCount;
+  };
+
+  loadMore.addEventListener('click', () => {
+    visibleCount += PAGE_SIZE;
+    render();
+  });
+
+  // Category filter pills (only when categories were authored).
+  if (categories.length) {
+    const filters = document.createElement('div');
+    filters.className = 'accordion-faq-filters';
+
+    const makePill = (labelText, value) => {
+      const pill = document.createElement('button');
+      pill.type = 'button';
+      pill.className = 'accordion-faq-filter';
+      pill.textContent = labelText;
+      if (value === activeCategory) pill.classList.add('active');
+      pill.addEventListener('click', () => {
+        activeCategory = value;
+        visibleCount = PAGE_SIZE;
+        [...filters.children].forEach((c) => c.classList.remove('active'));
+        pill.classList.add('active');
+        render();
+      });
+      return pill;
+    };
+
+    filters.append(makePill('All', 'all'));
+    categories.forEach((c) => filters.append(makePill(c, c)));
+    block.append(filters);
+  }
+
+  block.append(list, loadMore);
+  render();
 }
