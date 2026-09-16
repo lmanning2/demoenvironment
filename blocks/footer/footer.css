@@ -1,15 +1,14 @@
 /* stylelint-disable no-descending-specificity */
 
-/* ===== Nile Air footer ===== */
-:root {
-  --nileair-navy: rgb(22 40 68);
-  --nileair-navy-dark: rgb(15 27 47);
-  --nileair-gold: rgb(196 175 121);
-}
+/* ===== TAQA Distribution footer =====
+   Layout: white background. A "Download our apps" block and a teal-gradient
+   brand-logo panel share the upper band; below them a "Follow us" social row
+   with dark icons, a row of legal links, and the copyright line. */
 
 footer {
-  background-color: var(--nileair-navy);
-  color: #fff;
+  background-color: #fff;
+  color: var(--text-color);
+  font-family: var(--body-font-family);
   font-size: var(--body-font-size-s);
 }
 
@@ -18,31 +17,126 @@ footer p {
 }
 
 footer a:any-link {
-  color: #fff;
+  color: var(--link-color);
   text-decoration: none;
+  transition: color 0.2s ease, opacity 0.2s ease;
 }
 
 footer a:hover {
-  color: var(--nileair-gold);
+  color: var(--taqa-purple);
   text-decoration: none;
 }
 
-/* ===== social bar (top strip) ===== */
+/* image links (app badges, brand logos) can't change text colour — fade on hover */
+footer a:has(img):hover {
+  opacity: 0.8;
+}
+
+/* ===== apps band: full-width white band with a tall purple accent block on
+   the left (~20% wide) and the "Download our apps" content on the right ===== */
+footer .footer-apps {
+  position: relative;
+  box-sizing: border-box;
+  min-height: 200px;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: right;
+}
+
+/* decorative purple block pinned to the left edge, spanning the band height */
+footer .footer-apps::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 20%;
+  background: var(--taqa-purple);
+}
+
+footer .footer-apps p:first-child {
+  margin-bottom: 16px;
+  font-size: 16px;
+  color: var(--text-color);
+}
+
+footer .footer-apps a {
+  display: inline-block;
+  margin-left: 16px;
+}
+
+footer .footer-apps img {
+  height: 52px;
+  width: auto;
+}
+
+/* ===== brand logo band: full-width, white left cell (~20%) holding the
+   group-company logo + teal-gradient right cell holding the white distribution
+   logo. The two logos are the <p> children of the DA default-content-wrapper,
+   so the grid is applied to whichever element directly holds them. ===== */
+footer .footer-logo {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+/* the wrapper that directly holds the two logo <p>s is the grid */
+footer .footer-logo > div {
+  box-sizing: border-box;
+  margin: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+footer .footer-logo p {
+  margin: 0;
+  line-height: 0;
+  display: flex;
+  align-items: center;
+  min-height: 180px;
+}
+
+/* first logo (A TAQA Group Company) sits on white */
+footer .footer-logo p:first-child {
+  justify-content: center;
+  padding: 40px 24px;
+  background: #fff;
+}
+
+/* second logo (TAQA Distribution, white) sits on the teal gradient */
+footer .footer-logo p:last-child {
+  justify-content: flex-end;
+  padding: 40px 24px;
+  background: linear-gradient(90deg, #6fce6b 0%, #0ab3a1 60%, #00b3c4 100%);
+}
+
+footer .footer-logo img {
+  height: 88px;
+  width: auto;
+}
+
+/* ===== social bar (Follow us) ===== */
 footer .footer-social {
-  background-color: var(--nileair-navy);
-  padding: 15px 0;
-  border-bottom: 1px solid rgb(255 255 255 / 12%);
+  box-sizing: border-box;
+  max-width: var(--content-max-width, 1200px);
+  margin: 0 auto;
+  padding: 32px 24px 16px;
+}
+
+footer .footer-social p {
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: var(--text-color);
 }
 
 footer .footer-social ul {
   list-style: none;
-  margin: 0 auto;
+  margin: 0;
   padding: 0;
-  max-width: 1200px;
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: 22px;
+  gap: 18px;
 }
 
 footer .footer-social li {
@@ -53,179 +147,94 @@ footer .footer-social a {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
-  color: #fff;
+  width: 24px;
+  height: 24px;
+  color: var(--taqa-teal);
 }
 
 footer .footer-social a:hover {
-  color: var(--nileair-gold);
+  color: var(--taqa-purple);
 }
 
 footer .footer-social svg {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   display: block;
 }
 
-/* ===== brand (15-years logo) ===== */
-footer .footer-brand {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 32px 24px 8px;
-}
-
-footer .footer-brand p {
-  line-height: 0;
-}
-
-footer .footer-brand img {
-  width: 150px;
-  height: auto;
-}
-
-/* ===== accordion / link columns ===== */
-footer .footer-columns {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 8px 24px 24px;
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 0;
-}
-
-footer .footer-column h4 {
-  margin: 0;
-  padding: 14px 0;
-  font-size: 13px;
-  font-weight: 500;
-  color: #fff;
-  border-bottom: 1px solid rgb(255 255 255 / 12%);
-  position: relative;
-  cursor: pointer;
-}
-
-/* chevron on accordion titles */
-footer .footer-column h4::after {
-  content: '';
-  position: absolute;
-  top: 18px;
-  right: 4px;
-  width: 8px;
-  height: 8px;
-  border: 2px solid currentcolor;
-  border-width: 2px 2px 0 0;
-  border-radius: 0 1px 0 0;
-  transform: rotate(135deg);
-  transition: transform 0.2s ease;
-}
-
-footer .footer-column h4[aria-expanded='true']::after {
-  transform: rotate(-45deg);
-  top: 22px;
-}
-
-footer .footer-column ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.25s ease;
-}
-
-footer .footer-column h4[aria-expanded='true'] + ul {
-  max-height: 500px;
-  padding: 10px 0;
-}
-
-footer .footer-column li {
-  margin: 0 0 10px;
-  line-height: 1.4;
-  font-size: 14px;
-}
-
-/* ===== bottom bar (secondary links + copyright) ===== */
+/* ===== bottom bar (legal links + copyright) ===== */
 footer .footer-bottom {
-  background-color: var(--nileair-navy-dark);
-  padding: 20px 24px 25px;
+  box-sizing: border-box;
+  max-width: var(--content-max-width, 1200px);
+  margin: 0 auto;
+  padding: 16px 24px 32px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 32px;
 }
 
 footer .footer-bottom ul {
   list-style: none;
-  margin: 0 auto 12px;
+  margin: 0;
   padding: 0;
-  max-width: 1200px;
   display: flex;
   flex-wrap: wrap;
-  gap: 10px 24px;
+  gap: 8px 24px;
 }
 
 footer .footer-bottom li {
   font-size: 13px;
 }
 
-footer .footer-bottom p {
-  max-width: 1200px;
-  margin: 0 auto;
-  color: rgb(217 219 225);
-  font-size: 13px;
+footer .footer-bottom li a {
+  color: var(--text-color);
 }
 
-/* ===== DESKTOP (>= 900px): centered collapsible dropdown columns ===== */
+footer .footer-bottom p {
+  color: #6b6c7a;
+  font-size: 13px;
+  margin-left: auto;
+}
+
+/* ===== DESKTOP (>= 900px) ===== */
 @media (width >= 900px) {
-  footer .footer-brand {
-    padding: 40px 32px 8px;
-    text-align: center;
-  }
-
-  footer .footer-brand p {
-    line-height: 0;
-  }
-
-  footer .footer-brand img {
-    display: inline-block;
-  }
-
-  footer .footer-columns {
-    grid-template-columns: repeat(4, auto);
-    justify-content: center;
-    gap: 0 64px;
-    padding: 8px 32px 32px;
-    align-items: start;
-  }
-
-  /* title + chevron centered, chevron sits below the label */
-  footer .footer-column h4 {
-    border-bottom: 0;
-    padding: 0 0 24px;
-    margin: 0;
-    font-size: 16px;
-    text-align: center;
-  }
-
-  footer .footer-column h4::after {
-    top: unset;
-    right: unset;
-    bottom: 6px;
-    left: 50%;
-    margin-left: -4px;
-  }
-
-  footer .footer-column h4[aria-expanded='true']::after {
-    bottom: 2px;
-  }
-
-  /* collapsed by default on desktop too; expands on click */
-  footer .footer-column ul {
-    text-align: center;
-  }
-
+  footer .footer-social,
   footer .footer-bottom {
-    padding: 20px 32px 25px;
+    padding-left: 64px;
+    padding-right: 64px;
   }
 
-  footer .footer-bottom ul {
+  /* apps band matches the source ~294px tall band */
+  footer .footer-apps {
+    min-height: 294px;
+    padding: 48px 64px;
+  }
+
+  footer .footer-apps img {
+    height: 60px;
+  }
+
+  /* logo band: narrow white left cell (~20%) + wide gradient right cell (~80%) */
+  footer .footer-logo > div {
+    grid-template-columns: 1fr 4fr;
+  }
+
+  footer .footer-logo p {
+    min-height: 294px;
+  }
+
+  footer .footer-logo p:first-child {
     justify-content: flex-start;
+    padding: 56px 64px;
+  }
+
+  footer .footer-logo p:last-child {
+    justify-content: flex-end;
+    padding: 56px 64px;
+  }
+
+  footer .footer-logo img {
+    height: 114px;
   }
 }

@@ -2,48 +2,63 @@
 /* global WebImporter */
 /**
  * Parser for cards-quicklink. Base: cards.
- * Source: https://www.nileair.com/
- *   Instance A: div.feature-area.demo_bg  -> .single-feature (icon + h4.title>a)
- *   Instance B: div.choose-area .row       -> .single-choose (icon + h4.title>span, card wrapped in <a>)
- * Structure (library convention): 2 columns per row [image/icon | text content (title + optional CTA)].
+ * Source: help-and-support template — div[class*='findYourSolutionCard_container']
+ * Generated: 2026-09-16
+ *
+ * Cards library structure: 2 columns, multiple rows.
  *   Row 1: block name.
+ *   Each card row: [ image/icon | text content (title + optional CTA) ].
+ *
+ * TAQA DOM: each card is a <span class="findYourSolutionCard_container">
+ * wrapped in an <a href> (the CTA/link). Inside: a title <p> and an icon <img>.
+ * The parser handles either the whole carousel container (multiple cards) or a
+ * single card span being passed as the element. The instance selector targets
+ * the carousel container div, so all card spans inside are collected.
  */
 export default function parse(element, { document }) {
-  // Unified card selector covering both instance layouts.
-  let cards = Array.from(element.querySelectorAll('.single-feature, .single-choose'));
-  // Fallback: direct column wrappers if the inner class names differ.
+  // Collect cards. Handle element being the container OR an individual card.
+  let cards = Array.from(element.querySelectorAll('[class*="findYourSolutionCard_container"]'));
   if (cards.length === 0) {
-    cards = Array.from(element.querySelectorAll(':scope > .col, :scope > [class*="col-"]'));
+    if (element.matches && element.matches('[class*="findYourSolutionCard_container"]')) {
+      cards = [element];
+    } else {
+      // Fallback: each list item / slide is a card wrapper.
+      cards = Array.from(element.querySelectorAll('li, [class*="slide"]'));
+    }
   }
 
   const cells = [];
 
   cards.forEach((card) => {
+    // Title text of the card.
+    const title = card.querySelector('[class*="title"], h1, h2, h3, h4, h5, h6, p');
+    // Icon / image (decorative arrow or thumbnail).
     const image = card.querySelector('img');
-    const title = card.querySelector('h1, h2, h3, h4, h5, h6, .title');
-    // The card (choose-area) or the title (feature-area) may carry the link.
-    const cardLink = card.querySelector(':scope > a[href], a[href]');
+    // The card is typically wrapped in an anchor; look on the card and its ancestor.
+    let link = card.querySelector('a[href]');
+    if (!link) {
+      link = card.closest('a[href]');
+    }
 
-    if (!image && !title) return;
+    if (!title && !image) return;
 
     const contentCell = [];
     if (title) {
-      // If the heading has no link of its own but the card is a link, wrap the
-      // heading text in that link so the CTA/href is preserved.
-      const titleHasLink = title.querySelector('a[href]');
-      if (!titleHasLink && cardLink && cardLink.getAttribute('href')) {
-        const link = document.createElement('a');
-        link.setAttribute('href', cardLink.getAttribute('href'));
-        link.textContent = title.textContent.trim();
-        const heading = document.createElement(title.tagName.match(/^H[1-6]$/) ? title.tagName : 'h4');
-        heading.append(link);
-        contentCell.push(heading);
+      const href = link && link.getAttribute('href') ? link.getAttribute('href').trim() : '';
+      if (href) {
+        // Preserve the CTA link on the title text.
+        const a = document.createElement('a');
+        a.setAttribute('href', href);
+        a.textContent = title.textContent.trim();
+        const p = document.createElement('p');
+        p.append(a);
+        contentCell.push(p);
       } else {
         contentCell.push(title);
       }
     }
 
-    // 2-column row: [icon image | text content].
+    // 2-column row: [ icon/image | text content ].
     cells.push([image || '', contentCell]);
   });
 

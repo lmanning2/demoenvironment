@@ -2,57 +2,59 @@
 /* global WebImporter */
 /**
  * Parser for accordion-faq. Base: accordion.
- * Sources:
- *   Home (div.faq-area.gray_bg): .card items -> .card-header button (title) + .collapse .card-body (content).
- *   Content pages (#pets, #*-faqs): same .card pattern (question label + rich answer body).
- * The section title (.faq-title h2) is default content — excluded here.
- * Structure (library convention): 2 columns per row [title | content]. Row 1 = block name.
+ * Source: help-and-support template — div[class*='faqsection_faqContainer']
+ * Generated: 2026-09-16
+ *
+ * Accordion library structure: 2 columns, multiple rows.
+ *   Row 1: block name.
+ *   Each item row: [ title (question) | content (answer body) ].
+ *
+ * TAQA DOM: each FAQ item is a <div class="faqsection_question">. The visible
+ * label is a <p> inside a <span>; a "+" toggle <span> follows. The answer body
+ * may be a sibling element revealed on expand. A "LOAD MORE" button is excluded.
  */
 export default function parse(element, { document }) {
-  // Accordion items. Prefer .card; fall back to generic accordion item patterns.
-  let items = Array.from(element.querySelectorAll('.card'));
+  // Accordion items: the question wrappers.
+  let items = Array.from(element.querySelectorAll('[class*="faqsection_question"]'));
   if (items.length === 0) {
-    items = Array.from(element.querySelectorAll('.accordion-item, [class*="accordion"] > [class*="item"]'));
+    items = Array.from(element.querySelectorAll('[class*="question"], [class*="accordion"] [class*="item"]'));
   }
 
   const cells = [];
 
   items.forEach((item) => {
-    // Title: the header button/label.
-    const header = item.querySelector('.card-header button, .card-header, button, .accordion-header, [class*="header"]');
-    // Content: the collapsible body. Prefer the innermost .card-body so its
-    // rich children (p/ul/ol/links) become the content cell directly, rather
-    // than an extra .collapse wrapper div.
-    const body = item.querySelector('.card-body')
-      || item.querySelector('.accordion-body')
-      || item.querySelector('.collapse')
-      || item.querySelector('[class*="body"]');
+    // Question label — first text paragraph, ignoring the "+"/"-" toggle span.
+    const label = item.querySelector('p, h1, h2, h3, h4, h5, h6, span > p');
 
-    if (!header && !body) return;
-
-    // Title cell: use the header's text as a clean label.
-    let titleCell;
-    if (header) {
-      const label = document.createElement('p');
-      label.textContent = header.textContent.trim();
-      titleCell = label;
-    } else {
-      titleCell = '';
+    // Answer body: look for a nested answer container, or a following sibling.
+    // NOTE: avoid matching typography classes like "typography--variant-body4"
+    // on the question <p>; only match dedicated answer/collapse containers.
+    let answer = item.querySelector('[class*="faqsection_answer"], [class*="answer"], [class*="collapse"], [class*="faqContent"]');
+    if (!answer
+      && item.nextElementSibling
+      && item.nextElementSibling.matches
+      && item.nextElementSibling.matches('[class*="answer"], [class*="collapse"], [class*="faqContent"]')) {
+      answer = item.nextElementSibling;
     }
 
-    // Content cell: preserve the body's rich content (paragraphs, lists, links).
-    let contentCell;
-    if (body) {
-      // Collect the meaningful children of the body (p, ul, ol, etc.).
-      const bodyChildren = Array.from(body.children).length
-        ? Array.from(body.children)
-        : [body];
-      contentCell = bodyChildren;
-    } else {
-      contentCell = '';
+    if (!label && !answer) return;
+
+    // Title cell: clean question text.
+    let titleCell = '';
+    if (label) {
+      const p = document.createElement('p');
+      p.textContent = label.textContent.trim();
+      titleCell = p;
     }
 
-    // 2-column row: [title | content].
+    // Content cell: rich answer body if present, else empty (mandatory cell padded).
+    let contentCell = '';
+    if (answer) {
+      const children = Array.from(answer.children);
+      contentCell = children.length ? children : [answer];
+    }
+
+    // 2-column row: [ title | content ].
     cells.push([titleCell, contentCell]);
   });
 

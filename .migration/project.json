@@ -2,9 +2,10 @@
   "type": "da",
   "sites": {
     "demoenvironment": {
+      "libraryUrl": "https://main--sta-boilerplate--aemdemos.aem.page/tools/sidekick/library.json",
       "previewOrg": "lmanning2",
       "previewSite": "demoenvironment",
-      "libraryUrl": "https://main--sta-boilerplate--aemdemos.aem.page/tools/sidekick/library.json"
+      "contentHostUrl": "https://content.da.live/lmanning2/demoenvironment/"
     }
   }
 }
