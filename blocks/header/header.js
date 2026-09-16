@@ -182,6 +182,32 @@ export default async function decorate(block) {
           panel.append(ul);
           ul.classList.add(i === 0 ? 'nav-mega-tiles' : 'nav-mega-cta');
         });
+        // Normalize the promo CTA cards so their layout is resilient to how the
+        // content source delivers the markup. Locally the card is
+        // <strong>…</strong><span>…</span><img>, but Document Authoring strips
+        // the <span> (leaving a bare text node) and wraps the arrow <img> in a
+        // <picture>. The CSS grid targets a direct-child <img> and a <span>, so
+        // rebuild that structure here.
+        const cta = panel.querySelector('.nav-mega-cta');
+        if (cta) {
+          cta.querySelectorAll(':scope > li > a').forEach((cardLink) => {
+            // Unwrap any <picture> around the arrow so the <img> is a direct
+            // grid child again.
+            cardLink.querySelectorAll('picture').forEach((pic) => {
+              const pImg = pic.querySelector('img');
+              if (pImg) pic.replaceWith(pImg);
+              else pic.remove();
+            });
+            // Wrap the bare description text node(s) in a <span>.
+            [...cardLink.childNodes].forEach((node) => {
+              if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+                const span = document.createElement('span');
+                span.textContent = node.textContent.trim();
+                node.replaceWith(span);
+              }
+            });
+          });
+        }
       }
       navSection.setAttribute('aria-expanded', 'false');
       navSection.addEventListener('click', (e) => {
