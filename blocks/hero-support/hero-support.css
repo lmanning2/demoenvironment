@@ -4,8 +4,13 @@
    the media band simply renders the image full-width at its natural aspect
    ratio (no cropping) and the content band handles typography + rhythm. */
 
+/* Break the hero out of the section's 1200px max-width so the banner spans the
+   full viewport width with no left/right gutters. */
 .hero-support-wrapper {
-  max-width: unset;
+  max-width: none;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
   padding: 0;
 }
 
