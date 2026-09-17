@@ -329,6 +329,14 @@ main > .section:first-of-type {
   margin-top: 0;
 }
 
+/* Collapse empty sections. The importer can leave a trailing empty section
+   (e.g. from the metadata <hr>); its 40px margin would otherwise open a white
+   gap between the last content section and the footer. */
+main > .section:empty {
+  margin: 0;
+  padding: 0;
+}
+
 @media (width >= 900px) {
   main > .section > div {
     padding: 0 32px;
