@@ -28,6 +28,12 @@ export default function decorate(block) {
     } else if (img) {
       media.append(createOptimizedPicture(img.src, img.alt, true));
     }
+    // This banner is the LCP element — hint the browser to fetch it first.
+    const heroImg = media.querySelector('img');
+    if (heroImg) {
+      heroImg.setAttribute('fetchpriority', 'high');
+      heroImg.setAttribute('loading', 'eager');
+    }
     block.prepend(media);
     mediaRow.remove();
   }
