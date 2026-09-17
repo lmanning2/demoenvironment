@@ -162,10 +162,12 @@ function buildFaqTwoColumn(main) {
  */
 function buildAppPromo(main) {
   if (main !== document.querySelector('main')) return;
-  // The eyebrow is a <p>POWERING</p> immediately followed by <p>COMMUNITIES</p>.
-  const eyebrow = [...main.querySelectorAll('p')].find(
-    (p) => p.textContent.trim() === 'POWERING'
-      && p.nextElementSibling?.textContent.trim() === 'COMMUNITIES',
+  // The eyebrow is a "POWERING" node immediately followed by "COMMUNITIES".
+  // The help-and-support template authors these as <p>; the residential
+  // overview authors them as <h5> — accept either.
+  const eyebrow = [...main.querySelectorAll('p, h1, h2, h3, h4, h5, h6')].find(
+    (el) => el.textContent.trim() === 'POWERING'
+      && el.nextElementSibling?.textContent.trim() === 'COMMUNITIES',
   );
   if (!eyebrow || eyebrow.closest('.app-promo')) return;
 
