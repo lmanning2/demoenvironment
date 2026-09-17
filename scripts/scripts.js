@@ -152,12 +152,84 @@ function buildFaqTwoColumn(main) {
 }
 
 /**
+ * Residential help-and-support pages carry an app-download promo authored as
+ * loose default content: a "POWERING" + "COMMUNITIES" eyebrow, an <h6>/<h5>
+ * headline, an "Upgrade to a new experience" line, and the two app-store badge
+ * links. Wrap that run of sibling nodes into an `app-promo` block so it renders
+ * as the source's teal-gradient card. Runs before decorateSections so it
+ * operates on the raw section divs.
+ * @param {Element} main The container element
+ */
+function buildAppPromo(main) {
+  if (main !== document.querySelector('main')) return;
+  // The eyebrow is a <p>POWERING</p> immediately followed by <p>COMMUNITIES</p>.
+  const eyebrow = [...main.querySelectorAll('p')].find(
+    (p) => p.textContent.trim() === 'POWERING'
+      && p.nextElementSibling?.textContent.trim() === 'COMMUNITIES',
+  );
+  if (!eyebrow || eyebrow.closest('.app-promo')) return;
+
+  // Gather the eyebrow and following siblings up to and including the badges
+  // paragraph (the <p> that holds the app-store image links).
+  const nodes = [];
+  let node = eyebrow;
+  while (node) {
+    nodes.push(node);
+    const isBadges = node.tagName === 'P' && node.querySelector('a img');
+    if (isBadges) break;
+    node = node.nextElementSibling;
+  }
+  if (!nodes.length) return;
+
+  const block = buildBlock('app-promo', { elems: nodes.map((n) => n.cloneNode(true)) });
+  nodes[0].replaceWith(block);
+  nodes.slice(1).forEach((n) => n.remove());
+}
+
+/**
+ * On residential help-and-support pages the app-promo card sits beside the
+ * energy-saving-tips carousel (its "ENERGY SAVING TIPS" heading + carousel) as
+ * a two-column row. The imported section is a flat list of wrappers; group the
+ * app-promo into a left column and the tips heading + carousel into a right
+ * column so CSS can lay them side by side. Runs after decorateBlocks so the
+ * per-block `<name>-wrapper` classes exist.
+ * @param {Element} main The container element
+ */
+function buildAppPromoRow(main) {
+  if (main !== document.querySelector('main')) return;
+  main.querySelectorAll(':scope > .section').forEach((section) => {
+    const appPromo = section.querySelector(':scope > .app-promo-wrapper');
+    const carousel = section.querySelector(':scope > .carousel-tips-wrapper');
+    if (!appPromo || !carousel) return;
+    if (section.querySelector(':scope > .app-promo-row')) return;
+
+    const row = document.createElement('div');
+    row.className = 'app-promo-row';
+    const sideCol = document.createElement('div');
+    sideCol.className = 'app-promo-tips';
+
+    // Everything from the app-promo up to and including the carousel forms the
+    // row: app-promo on the left, the tips heading + carousel on the right.
+    const children = [...section.children];
+    const start = children.indexOf(appPromo);
+    const end = children.indexOf(carousel);
+    section.insertBefore(row, appPromo);
+    children.slice(start, end + 1).forEach((child) => {
+      if (child === appPromo) row.append(child);
+      else sideCol.append(child);
+    });
+    row.append(sideCol);
+  });
+}
+
+/**
  * Builds all synthetic blocks in a container element.
  * @param {Element} main The container element
  */
 function buildAutoBlocks(main) {
   try {
     buildPageHero(main);
+    buildAppPromo(main);
     // auto load `*/fragments/*` references
     const fragments = [...main.querySelectorAll('a[href*="/fragments/"]')].filter((f) => !f.closest('.fragment'));
     if (fragments.length > 0) {
@@ -258,6 +330,7 @@ export function decorateMain(main) {
   decorateSections(main);
   decorateSectionMetadata(main);
   decorateBlocks(main);
+  buildAppPromoRow(main);
   buildFaqTwoColumn(main);
   decorateButtons(main);
 }
