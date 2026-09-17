@@ -3,6 +3,17 @@
    heading, and three pill CTAs on the left, with a large banner photo bleeding
    in from the right behind a navy-to-transparent gradient. Mobile-first. */
 
+/* Break the hero out of the section's 1200px max-width so the navy band spans
+   the full viewport width with no left/right gutters. The selector is scoped
+   through main > .section to outrank `main > .section > div { max-width }`. */
+main > .section > .hero-residential-wrapper {
+  max-width: none;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  padding: 0;
+}
+
 .hero-residential.block {
   position: relative;
   box-sizing: border-box;
