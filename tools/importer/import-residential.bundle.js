@@ -71,8 +71,9 @@ var CustomImportScript = (() => {
       eyebrow.textContent = eyebrowText;
       contentCell.push(eyebrow);
     }
-    headings.forEach((h) => {
-      const heading = document.createElement(h.tagName);
+    headings.forEach((h, i) => {
+      const tag = i === 0 ? "h1" : "h2";
+      const heading = document.createElement(tag);
       heading.textContent = h.textContent.trim();
       contentCell.push(heading);
     });

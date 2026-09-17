@@ -46,8 +46,12 @@ export default function parse(element, { document }) {
     eyebrow.textContent = eyebrowText;
     contentCell.push(eyebrow);
   }
-  headings.forEach((h) => {
-    const heading = document.createElement(h.tagName);
+  // Promote the hero headings so the page has a single top-level <h1> (the
+  // source uses <h3>, which leaves the page with no H1 and hurts SEO). The
+  // first line becomes the H1; the second (if any) becomes an H2.
+  headings.forEach((h, i) => {
+    const tag = i === 0 ? 'h1' : 'h2';
+    const heading = document.createElement(tag);
     heading.textContent = h.textContent.trim();
     contentCell.push(heading);
   });
