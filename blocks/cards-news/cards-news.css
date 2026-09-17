@@ -33,7 +33,7 @@
 
 .cards-news .cards-news-card-image img {
   width: 100%;
-  aspect-ratio: 606 / 272;
+  aspect-ratio: 480 / 298;
   object-fit: cover;
   display: block;
 }
