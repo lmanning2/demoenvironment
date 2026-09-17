@@ -107,8 +107,81 @@
         "https://taqadistribution.com/addc/en-us/residential/overview"
       ],
       "representativeUrl": "https://taqadistribution.com/addc/en-us/residential/overview",
-      "description": "To be named in naming step",
-      "blocks": [],
+      "description": "Residential overview landing page: a navy spotlight hero with an eyebrow, two-line heading and CTAs over a banner photo; a 'New brand-same exceptional service' intro with three tall image USP tiles; an app-download promo band; and an Announcements news carousel.",
+      "blocks": [
+        {
+          "name": "hero-residential",
+          "instances": [
+            "div[class*='imageTextSpotlight_detailsContainer']"
+          ]
+        },
+        {
+          "name": "cards-usp-overlay",
+          "instances": [
+            "div[class*='featuresCarousel_carousel']:not([class*='indicators'])"
+          ]
+        },
+        {
+          "name": "cards-news",
+          "instances": [
+            "div[class*='customCarousel_container']"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "rc2",
+          "name": "Hero",
+          "selector": [
+            "div[class*='imageTextSpotlight_detailsContainer']"
+          ],
+          "style": null,
+          "blocks": [
+            "hero-residential"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "rc3",
+          "name": "New Brand",
+          "selector": [
+            "div[class*='featuresCarousel_sectionheaderunit']"
+          ],
+          "style": null,
+          "blocks": [
+            "cards-usp-overlay"
+          ],
+          "defaultContent": [
+            "div[class*='featuresCarousel_featuresCarouselText']"
+          ]
+        },
+        {
+          "id": "rc4",
+          "name": "App Promo",
+          "selector": [
+            "div[class*='downloadApp_appsectioncontainer']"
+          ],
+          "style": null,
+          "blocks": [],
+          "defaultContent": [
+            "div[class*='downloadApp_appcontent']"
+          ]
+        },
+        {
+          "id": "rc5",
+          "name": "Announcements",
+          "selector": [
+            "div[class*='customCarousel_container']"
+          ],
+          "style": null,
+          "blocks": [
+            "cards-news"
+          ],
+          "defaultContent": [
+            "div[class*='customCarousel_leftHeaderContainer']"
+          ]
+        }
+      ],
       "urlPattern": "/addc/en-us/residential/*"
     }
   ]

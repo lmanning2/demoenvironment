@@ -23,37 +23,43 @@
   gap: 12px;
 }
 
-.app-promo h6 {
-  margin: 12px 0 0;
-  font-size: 20px;
-  font-weight: 600;
-  line-height: 1.3;
-  color: #fff;
-}
-
-.app-promo h5 {
-  margin: 0;
-  font-size: 28px;
-  font-weight: 400;
-  line-height: 1.25;
-  color: #fff;
-}
-
-/* "Upgrade to a new experience" */
-.app-promo h5 + p {
-  margin: 8px 0 0;
-  font-size: 15px;
-  color: #fff;
-}
-
-/* eyebrow: POWERING / COMMUNITIES — two stacked bold lines */
-.app-promo > div > div > p:first-child,
-.app-promo > div > div > p:nth-child(2) {
+/* eyebrow: POWERING / COMMUNITIES — two stacked bold lines (role-tagged in JS,
+   so this matches regardless of whether the source used <p> or a heading tag) */
+.app-promo .app-promo-eyebrow {
   margin: 0;
   font-family: var(--heading-font-family, inherit);
   font-size: 20px;
   font-weight: 700;
   line-height: 1.1;
+  color: #fff;
+}
+
+/* headline block: app-features line + the larger two-line title */
+.app-promo .app-promo-title {
+  margin: 0;
+  font-family: var(--heading-font-family, inherit);
+  font-weight: 600;
+  line-height: 1.25;
+  color: #fff;
+}
+
+/* first title line ("AN ENHANCED APP…") is the smaller lead-in */
+.app-promo .app-promo-title:nth-of-type(3) {
+  margin-top: 12px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+/* the main title lines are larger and lighter */
+.app-promo .app-promo-title:nth-of-type(n + 4) {
+  font-size: 26px;
+  font-weight: 400;
+}
+
+/* "Upgrade to a new experience" — a plain paragraph after the title lines */
+.app-promo p:not(.app-promo-badges, .app-promo-eyebrow, .app-promo-title) {
+  margin: 8px 0 0;
+  font-size: 15px;
   color: #fff;
 }
 
@@ -106,12 +112,12 @@
     justify-content: center;
   }
 
-  .app-promo h5 {
-    font-size: 33px;
+  .app-promo .app-promo-title:nth-of-type(3) {
+    font-size: 22px;
   }
 
-  .app-promo h6 {
-    font-size: 22px;
+  .app-promo .app-promo-title:nth-of-type(n + 4) {
+    font-size: 33px;
   }
 
   .app-promo .app-promo-badges img {
