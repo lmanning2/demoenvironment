@@ -5,8 +5,9 @@
    ratio (no cropping) and the content band handles typography + rhythm. */
 
 /* Break the hero out of the section's 1200px max-width so the banner spans the
-   full viewport width with no left/right gutters. */
-.hero-support-wrapper {
+   full viewport width with no left/right gutters. The selector is scoped
+   through main > .section to outrank `main > .section > div { max-width }`. */
+main > .section > .hero-support-wrapper {
   max-width: none;
   width: 100vw;
   margin-left: calc(50% - 50vw);
