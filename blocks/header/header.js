@@ -160,6 +160,27 @@ export default async function decorate(block) {
   const toolsList = navTools && navTools !== navSections ? getTopLevelList(navTools) : null;
   if (toolsList) toolsList.classList.add('nav-tools-list');
 
+  // Tag the "Outages and Maintenance" utility item so CSS can pin it to the
+  // left of the purple bar (the source keeps it opposite the other links).
+  if (toolsList) {
+    const outages = [...toolsList.children].find(
+      (li) => /outages/i.test(li.textContent),
+    );
+    if (outages) outages.classList.add('nav-tools-outages');
+  }
+
+  // Highlight the top-level nav item matching the current page's section.
+  // Pages under /help-and-support/ keep HELP & SUPPORT active.
+  if (sectionsList) {
+    const path = window.location.pathname;
+    getTopLevelItems(navSections).forEach((li) => {
+      const label = (li.querySelector(':scope > a, :scope > p')?.textContent || '').trim().toLowerCase();
+      if (/help\s*&?\s*support/.test(label) && path.includes('/help-and-support/')) {
+        li.classList.add('nav-active');
+      }
+    });
+  }
+
   // Main nav items: mark items with a sub-menu as mega-menu triggers.
   if (navSections) {
     getTopLevelItems(navSections).forEach((navSection) => {
