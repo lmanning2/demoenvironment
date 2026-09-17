@@ -288,6 +288,7 @@ header nav .nav-sections .nav-sections-list > li:last-child a:hover {
 
   header nav .nav-tools .nav-tools-list {
     justify-content: flex-end;
+    align-items: center;
   }
 
   header nav .nav-tools .nav-tools-list > li > a {
@@ -297,6 +298,12 @@ header nav .nav-sections .nav-sections-list > li:last-child a:hover {
   header nav .nav-tools .nav-tools-list > li > a:hover {
     color: #fff;
     opacity: 0.8;
+  }
+
+  /* "Outages and Maintenance" sits on the far left of the purple bar; the
+     auto right margin pushes the remaining links to the right. */
+  header nav .nav-tools .nav-tools-list > li.nav-tools-outages {
+    margin-right: auto;
   }
 
   header nav .nav-brand {
@@ -327,6 +334,26 @@ header nav .nav-sections .nav-sections-list > li:last-child a:hover {
   /* active/hover accent underline on top-level items */
   header nav .nav-sections .nav-sections-list > li > a:hover {
     color: var(--taqa-purple);
+  }
+
+  /* active section (e.g. HELP & SUPPORT on help-and-support pages): purple
+     label with a 4px purple underline, matching the source. The link may be
+     wrapped in a <p> (DA delivery) or sit directly in the <li>. */
+  header nav .nav-sections .nav-sections-list > li.nav-active > a,
+  header nav .nav-sections .nav-sections-list > li.nav-active > p > a {
+    position: relative;
+    color: var(--taqa-purple);
+  }
+
+  header nav .nav-sections .nav-sections-list > li.nav-active > a::after,
+  header nav .nav-sections .nav-sections-list > li.nav-active > p > a::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -34px;
+    height: 4px;
+    background: var(--taqa-purple);
   }
 
   /* desktop dropdown: full-width white mega-panel below the header, spanning
