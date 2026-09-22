@@ -209,9 +209,12 @@ function buildAppPromo(main) {
 function buildLocationCards(main) {
   if (main !== document.querySelector('main')) return;
   // The finder heading is "Find a location" (EN) or "ابحث عن مركز..." (AR).
+  // Exclude the page hero, whose heading ("FIND A LOCATION IN YOUR COMMUNITY")
+  // shares the same prefix but sits inside the .hero-text block and is not the
+  // finder list.
   const headingRe = /^(find a location|ابحث عن مر(كز|اكز))/i;
   const heading = [...main.querySelectorAll('h1, h2, h3, h4, h5, h6, p')].find(
-    (el) => headingRe.test(el.textContent.trim()),
+    (el) => headingRe.test(el.textContent.trim()) && !el.closest('.hero-text'),
   );
   if (!heading || heading.closest('.cards-location')) return;
 
@@ -292,6 +295,23 @@ function buildLocationCards(main) {
 }
 
 /**
+ * On the locations pages, inserts an interactive map block above the location
+ * cards. The map itself is not authored content — it's synthesized here and
+ * decorated by the location-map block, which reads shipped coordinates and (if
+ * a Google Maps key is configured in page metadata) renders pins linked to the
+ * cards. Must run after buildLocationCards so the cards-location block exists.
+ * @param {Element} main The container element
+ */
+function buildLocationMap(main) {
+  if (main !== document.querySelector('main')) return;
+  if (!/\/locations\/(branches|partners)/i.test(window.location.pathname)) return;
+  const cards = main.querySelector('.cards-location');
+  if (!cards || main.querySelector('.location-map')) return;
+  const map = buildBlock('location-map', [[{ elems: [] }]]);
+  cards.parentElement.insertBefore(map, cards);
+}
+
+/**
  * On residential help-and-support pages the app-promo card sits beside the
  * energy-saving-tips carousel (its "ENERGY SAVING TIPS" heading + carousel) as
  * a two-column row. The imported section is a flat list of wrappers; group the
@@ -336,6 +356,7 @@ function buildAutoBlocks(main) {
     buildPageHero(main);
     buildAppPromo(main);
     buildLocationCards(main);
+    buildLocationMap(main);
     // auto load `*/fragments/*` references
     const fragments = [...main.querySelectorAll('a[href*="/fragments/"]')].filter((f) => !f.closest('.fragment'));
     if (fragments.length > 0) {
