@@ -1,0 +1,26 @@
+{
+  "branches": [
+    { "name": "Mussafah Village Mall", "ar": "قرية مصفح مول", "lat": 24.359, "lng": 54.502 },
+    { "name": "Madinat Zayed Service Center", "ar": "مركز خدمة مدينة زايد", "lat": 23.652, "lng": 53.7047 },
+    { "name": "Al Marfah TAMM Center", "ar": "مركز تم المرفأ", "lat": 24.08758, "lng": 53.491596 },
+    { "name": "Al Sila TAMM Center", "ar": "مركز تم السلع", "lat": 24.0164, "lng": 51.766 },
+    { "name": "Delma TAMM Center", "ar": "مركز تم دلما", "lat": 24.48051, "lng": 52.31463 },
+    { "name": "Ghayati TAMM Center", "ar": "مركز تم غياثي", "lat": 23.899342, "lng": 52.801826 },
+    { "name": "Liwa TAMM Center", "ar": "مركز تم ليوا", "lat": 23.144501, "lng": 53.776942 },
+    { "name": "Customer Service Center- Al Souq (Emirates Complex)", "ar": "مركز خدمة المتعاملين - السوق (مجمع الامارات)", "lat": 24.225552, "lng": 55.747853 },
+    { "name": "Customer Service Center - Al Saad", "ar": "مركز خدمة المتعاملين - الساد", "lat": 24.19707, "lng": 55.607749 },
+    { "name": "Customer Service Center - Al Hayar", "ar": "مركز خدمة المتعاملين - الهير", "lat": 24.587556, "lng": 55.773182 },
+    { "name": "Customer Service Center - Al Wagan", "ar": "مركز خدمة المتعاملين - الوقن", "lat": 23.638548, "lng": 55.538444 }
+  ],
+  "partners": [
+    { "name": "Abu Dhabi area — 184 partner locations", "ar": "منطقة أبوظبي — 184 موقع شريك", "lat": 24.4539, "lng": 54.3773, "approx": true },
+    { "name": "Al Ain area — 59 partner locations", "ar": "منطقة العين — 59 موقع شريك", "lat": 24.2075, "lng": 55.7447, "approx": true },
+    { "name": "Dubai area — 15 partner locations", "ar": "منطقة دبي — 15 موقع شريك", "lat": 25.2048, "lng": 55.2708, "approx": true },
+    { "name": "Sharjah area — 6 partner locations", "ar": "منطقة الشارقة — 6 مواقع شريكة", "lat": 25.3463, "lng": 55.4209, "approx": true },
+    { "name": "Al Dhafra area — 5 partner locations", "ar": "منطقة الظفرة — 5 مواقع شريكة", "lat": 23.65, "lng": 53.7, "approx": true },
+    { "name": "Fujairah area — 3 partner locations", "ar": "منطقة الفجيرة — 3 مواقع شريكة", "lat": 25.1288, "lng": 56.3265, "approx": true },
+    { "name": "Ajman area — 1 partner location", "ar": "منطقة عجمان — موقع شريك واحد", "lat": 25.4052, "lng": 55.5136, "approx": true },
+    { "name": "Ras Al Khaimah area — 1 partner location", "ar": "منطقة رأس الخيمة — موقع شريك واحد", "lat": 25.7895, "lng": 55.9432, "approx": true },
+    { "name": "Umm Al Quwain area — 1 partner location", "ar": "منطقة أم القيوين — موقع شريك واحد", "lat": 25.5647, "lng": 55.5551, "approx": true }
+  ]
+}

@@ -1,0 +1,36 @@
+/* ===== location-map — interactive branch/partner map =====
+   Sits above the location cards. Mobile-first: full-width map, fixed height. */
+
+.location-map {
+  margin: 0 0 24px;
+}
+
+.location-map .location-map-canvas {
+  width: 100%;
+  height: 320px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgb(172 174 185 / 40%);
+}
+
+/* Location cards that are linked to a map pin get an affordance. */
+.cards-location .location-map-linked {
+  cursor: pointer;
+}
+
+.cards-location .location-map-linked:focus-visible {
+  outline: 2px solid var(--taqa-purple, #6b42d1);
+  outline-offset: 2px;
+}
+
+/* Google InfoWindow content uses the site font. */
+.location-map-canvas .gm-style .gm-style-iw {
+  font-family: var(--body-font-family);
+}
+
+/* ===== TABLET/DESKTOP (>= 900px) ===== */
+@media (width >= 900px) {
+  .location-map .location-map-canvas {
+    height: 460px;
+  }
+}
