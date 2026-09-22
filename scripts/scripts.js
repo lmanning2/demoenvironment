@@ -148,6 +148,15 @@ function buildFaqTwoColumn(main) {
 
     section.append(mainCol, sideCol);
     section.classList.add('faq-two-column');
+
+    // The "We are here to help" list imports each item with a literal "•"
+    // paragraph plus the CSS list marker, showing two bullets. Drop the literal
+    // bullet paragraphs so only the styled marker remains.
+    sideCol.querySelectorAll('li').forEach((li) => {
+      [...li.querySelectorAll(':scope > p')].forEach((p) => {
+        if (p.textContent.trim() === '•') p.remove();
+      });
+    });
   });
 }
 
