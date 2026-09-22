@@ -424,3 +424,22 @@ header nav .nav-sections .nav-sections-list > li:last-child a:hover {
     filter: brightness(0.95);
   }
 }
+
+/* ===== RTL (Arabic) header ===== */
+@media (width >= 900px) {
+  /* Outages pins to the right edge of the bar (mirrored) */
+  [dir="rtl"] header nav .nav-tools .nav-tools-list > li.nav-tools-outages {
+    margin-right: 0;
+    margin-left: auto;
+  }
+
+  /* Mega-panel content reads right-to-left */
+  [dir="rtl"] header nav .nav-sections .nav-mega-panel {
+    text-align: right;
+  }
+
+  /* Tile icon sits to the right of its label */
+  [dir="rtl"] header nav .nav-sections .nav-mega-tiles a {
+    flex-direction: row-reverse;
+  }
+}

@@ -183,6 +183,86 @@
         }
       ],
       "urlPattern": "/addc/en-us/residential/*"
+    },
+    {
+      "name": "locations",
+      "urls": [
+        "https://taqadistribution.com/addc/en-us/business/locations/branches",
+        "https://taqadistribution.com/addc/en-us/business/locations/partners"
+      ],
+      "representativeUrl": "https://taqadistribution.com/addc/en-us/business/locations/branches",
+      "description": "Locations page: a text-only page intro, a location finder (list of branch/partner cards with name, address and phone beside a map), a dark customer-support section with icon cards, and an app-download promo band.",
+      "blocks": [
+        {
+          "name": "hero-text",
+          "instances": [
+            "div[class*='textOnlySpotLight_detailsContainer']"
+          ]
+        },
+        {
+          "name": "cards-location",
+          "instances": [
+            "div[class*='locator_container']"
+          ]
+        },
+        {
+          "name": "cards-support",
+          "instances": [
+            "div[class*='customerSupport_subContainer']"
+          ]
+        }
+      ],
+      "sections": [
+        {
+          "id": "rc2",
+          "name": "Hero",
+          "selector": [
+            "div[class*='textOnlySpotLight_detailsContainer']"
+          ],
+          "style": null,
+          "blocks": [
+            "hero-text"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "rc3",
+          "name": "Location Finder",
+          "selector": [
+            "div[class*='locator_container']"
+          ],
+          "style": null,
+          "blocks": [
+            "cards-location"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "rc4",
+          "name": "Customer Support",
+          "selector": [
+            "div[class*='customerSupport_container']"
+          ],
+          "style": "dark",
+          "blocks": [
+            "cards-support"
+          ],
+          "defaultContent": []
+        },
+        {
+          "id": "rc5",
+          "name": "App Promo",
+          "selector": [
+            "div[class*='downloadApp_appsectioncontainer']"
+          ],
+          "style": null,
+          "blocks": [],
+          "defaultContent": [
+            "div[class*='downloadApp_appcontent']"
+          ]
+        }
+      ],
+      "urlPattern": "/addc/en-us/business/locations/*"
     }
   ]
 }
