@@ -68,16 +68,18 @@ function absorbLeakedFilters(block) {
 /**
  * The source loads each FAQ answer from its own widget only when expanded, so
  * imported pages capture empty answer cells. A shared answers file
- * (/content/faq-answers.json, with { en: {...}, ar: {...} } maps of question →
- * answer HTML) backfills them at render time, keyed by the question text.
- * @returns {Promise<Object>} map of question → answer HTML for the page locale
+ * (faq-answers.json in this block folder, with { en: {...}, ar: {...} } maps of
+ * question → answer text) backfills them at render time, keyed by the question
+ * text. Shipping it as a code asset (not DA content) keeps it version
+ * controlled and served on every environment.
+ * @returns {Promise<Object>} map of question → answer text for the page locale
  */
 let faqAnswersPromise;
 async function loadFaqAnswers() {
   if (!faqAnswersPromise) {
     faqAnswersPromise = (async () => {
-      const resp = await fetch('/content/faq-answers.json').catch(() => null)
-        || await fetch('/faq-answers.json').catch(() => null);
+      const base = `${window.hlx?.codeBasePath || ''}/blocks/accordion-faq/faq-answers.json`;
+      const resp = await fetch(base).catch(() => null);
       if (!resp || !resp.ok) return {};
       return resp.json().catch(() => ({}));
     })();
