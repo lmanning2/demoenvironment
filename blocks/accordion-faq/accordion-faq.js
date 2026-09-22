@@ -36,24 +36,60 @@ function absorbLeakedFilters(block) {
 
   const labels = [];
   const toRemove = [];
-  // The filter chip labels are the run of <p>s AFTER the intro sentence. Keep
-  // the intro sentence itself (the one that reads like a full sentence — has
-  // multiple words and ends with punctuation); treat everything after it as
-  // chip labels, dropping the stray "<"/">" scroll-arrow glyphs and "All".
+  // The filter chip labels are the run of <p>s AFTER the intro sentence. The
+  // intro is a full sentence (much longer than a chip label) — find the last
+  // such long paragraph and treat everything after it as chip labels. This is
+  // language-agnostic (works for English and Arabic). Drop the stray "<"/">"
+  // scroll-arrow glyphs and the "All" chip (EN "All" / AR "الجميع"), which the
+  // block re-adds itself.
   const paras = [...introWrapper.querySelectorAll(':scope > p')];
-  const introIdx = paras.findIndex((p) => /\b(questions|answers|browse|search)\b/i.test(p.textContent));
+  // The intro is the first paragraph that reads as a full sentence: long AND
+  // containing sentence punctuation (. ? Arabic ؟). Chip labels never do.
+  const introIdx = paras.findIndex(
+    (p) => p.textContent.trim().length > 60 && /[.?؟]/.test(p.textContent),
+  );
   const chipParas = introIdx >= 0 ? paras.slice(introIdx + 1) : paras;
+  const isAll = (t) => /^all$/i.test(t) || t === 'الجميع';
+  // The section heading text ("Looking for answers?" / "تبحث عن إجابات؟") is
+  // sometimes duplicated into the chip run — exclude it.
+  const headingText = introWrapper.querySelector('h3, h4, h5')?.textContent.trim();
   chipParas.forEach((p) => {
     const text = p.textContent.trim();
     toRemove.push(p);
-    if (text && text !== '<' && text !== '>' && !/^all$/i.test(text)) labels.push(text);
+    if (text && text !== '<' && text !== '>' && !isAll(text) && text !== headingText) {
+      labels.push(text);
+    }
   });
   if (labels.length < 2) return [];
   toRemove.forEach((n) => n.remove());
   return labels;
 }
 
-export default function decorate(block) {
+/**
+ * The source loads each FAQ answer from its own widget only when expanded, so
+ * imported pages capture empty answer cells. A shared answers file
+ * (/content/faq-answers.json, with { en: {...}, ar: {...} } maps of question →
+ * answer HTML) backfills them at render time, keyed by the question text.
+ * @returns {Promise<Object>} map of question → answer HTML for the page locale
+ */
+let faqAnswersPromise;
+async function loadFaqAnswers() {
+  if (!faqAnswersPromise) {
+    faqAnswersPromise = (async () => {
+      const resp = await fetch('/content/faq-answers.json').catch(() => null)
+        || await fetch('/faq-answers.json').catch(() => null);
+      if (!resp || !resp.ok) return {};
+      return resp.json().catch(() => ({}));
+    })();
+  }
+  const data = await faqAnswersPromise;
+  const isArabic = /\/ar(-[a-z]{2})?\//i.test(window.location.pathname);
+  return (isArabic ? data.ar : data.en) || {};
+}
+
+const normalizeQ = (s) => (s || '').replace(/\s+/g, ' ').trim().toLowerCase();
+
+export default async function decorate(block) {
   // Categories authored on the questions themselves take priority; otherwise
   // fall back to any leaked filter labels sitting before the block.
   const leakedCategories = absorbLeakedFilters(block);
@@ -75,9 +111,28 @@ export default function decorate(block) {
     const details = document.createElement('details');
     details.className = 'accordion-faq-item';
     if (category) details.dataset.category = category;
+    // Remember the question text so we can backfill an empty answer body.
+    details.dataset.question = summary.textContent.trim();
     details.append(summary, body);
     return details;
   });
+
+  // Backfill empty answer bodies from the shared answers file.
+  const answersEmpty = items.filter((it) => !it.querySelector('.accordion-faq-item-body').textContent.trim());
+  if (answersEmpty.length) {
+    const answers = await loadFaqAnswers();
+    const byQ = {};
+    Object.keys(answers).forEach((q) => { byQ[normalizeQ(q)] = answers[q]; });
+    answersEmpty.forEach((it) => {
+      const ans = byQ[normalizeQ(it.dataset.question)];
+      if (ans) {
+        const body = it.querySelector('.accordion-faq-item-body');
+        const p = document.createElement('p');
+        p.textContent = ans;
+        body.append(p);
+      }
+    });
+  }
 
   block.textContent = '';
 
