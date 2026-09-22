@@ -12,7 +12,52 @@
 
 const PAGE_SIZE = 4;
 
+/**
+ * Some imported pages carry the FAQ category filter as a run of loose <p>
+ * paragraphs immediately before the accordion block (a leftover of the source's
+ * scrollable filter widget), including stray "<"/">" scroll-arrow glyphs. When
+ * present — and when the questions carry no per-row category data of their own —
+ * collect those labels so they can render as the filter chip bar. Returns the
+ * cleaned category label list (without "All"/arrows) and removes the stray
+ * paragraphs from the DOM.
+ * @param {Element} block
+ * @returns {string[]}
+ */
+function absorbLeakedFilters(block) {
+  // The leaked filter labels sit in the preceding default-content wrapper (the
+  // same one that holds the "LOOKING FOR ANSWERS?" heading + intro), NOT inside
+  // the accordion block's own wrapper. Find that wrapper.
+  const blockWrapper = block.closest('.accordion-faq-wrapper') || block.parentElement;
+  const introWrapper = blockWrapper?.previousElementSibling?.classList?.contains('default-content-wrapper')
+    ? blockWrapper.previousElementSibling
+    : [...(blockWrapper?.parentElement?.children || [])]
+      .find((el) => el.classList?.contains('default-content-wrapper') && el.querySelector('h4, h3'));
+  if (!introWrapper) return [];
+
+  const labels = [];
+  const toRemove = [];
+  // The filter chip labels are the run of <p>s AFTER the intro sentence. Keep
+  // the intro sentence itself (the one that reads like a full sentence — has
+  // multiple words and ends with punctuation); treat everything after it as
+  // chip labels, dropping the stray "<"/">" scroll-arrow glyphs and "All".
+  const paras = [...introWrapper.querySelectorAll(':scope > p')];
+  const introIdx = paras.findIndex((p) => /\b(questions|answers|browse|search)\b/i.test(p.textContent));
+  const chipParas = introIdx >= 0 ? paras.slice(introIdx + 1) : paras;
+  chipParas.forEach((p) => {
+    const text = p.textContent.trim();
+    toRemove.push(p);
+    if (text && text !== '<' && text !== '>' && !/^all$/i.test(text)) labels.push(text);
+  });
+  if (labels.length < 2) return [];
+  toRemove.forEach((n) => n.remove());
+  return labels;
+}
+
 export default function decorate(block) {
+  // Categories authored on the questions themselves take priority; otherwise
+  // fall back to any leaked filter labels sitting before the block.
+  const leakedCategories = absorbLeakedFilters(block);
+
   // Build the <details> items from the authored rows.
   const items = [...block.children].map((row) => {
     const label = row.children[0];
@@ -36,7 +81,13 @@ export default function decorate(block) {
 
   block.textContent = '';
 
-  const categories = [...new Set(items.map((it) => it.dataset.category).filter(Boolean))];
+  // Per-question categories (real, filterable) take priority. If none exist but
+  // the source leaked a filter label run, use those as display chips — they
+  // can't filter the (single-category) imported questions, so selecting one
+  // simply shows all questions.
+  const rowCategories = [...new Set(items.map((it) => it.dataset.category).filter(Boolean))];
+  const categoriesAreFilterable = rowCategories.length > 0;
+  const categories = categoriesAreFilterable ? rowCategories : leakedCategories;
   let activeCategory = 'all';
   let visibleCount = PAGE_SIZE;
 
@@ -75,7 +126,9 @@ export default function decorate(block) {
       pill.textContent = labelText;
       if (value === activeCategory) pill.classList.add('active');
       pill.addEventListener('click', () => {
-        activeCategory = value;
+        // Only re-filter when categories map to questions; otherwise the chip
+        // is display-only (source loads that category's questions server-side).
+        activeCategory = categoriesAreFilterable ? value : 'all';
         visibleCount = PAGE_SIZE;
         [...filters.children].forEach((c) => c.classList.remove('active'));
         pill.classList.add('active');
