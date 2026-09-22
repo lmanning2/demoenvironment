@@ -246,23 +246,29 @@ export default async function decorate(block) {
       }
       navSection.setAttribute('aria-expanded', 'false');
       navSection.addEventListener('click', (e) => {
-        // Let real link clicks (leaf items) navigate; only toggle when clicking
-        // the top-level trigger itself.
-        const topLink = navSection.querySelector(':scope > a');
-        if (topLink && topLink.contains(e.target) && topLink.getAttribute('href') !== '#!') return;
-        if (submenu && (!topLink || topLink.getAttribute('href') === '#!')) {
-          e.preventDefault();
-        }
-        if (!submenu) return;
-        if (isDesktop.matches) {
-          const expanded = navSection.getAttribute('aria-expanded') === 'true';
-          toggleAllNavSections(navSections);
-          navSection.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-        } else if (e.target.closest(':scope > a, :scope > p, :scope > .nav-drop-toggle')
-          || e.target === navSection) {
-          const expanded = navSection.getAttribute('aria-expanded') === 'true';
-          navSection.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-        }
+        // The section's trigger is its FIRST direct child — either a top-level
+        // <a> (a linked category) or a <p>/.nav-drop-toggle (a menu-only label,
+        // e.g. "Help & Support" which DA delivers as plain text, not a link).
+        // Only that trigger toggles the mega-menu; clicks on links deeper inside
+        // the submenu are real navigation and must be left alone.
+        const trigger = navSection.querySelector(':scope > a, :scope > p, :scope > .nav-drop-toggle');
+        const onTrigger = trigger && trigger.contains(e.target);
+
+        // A leaf link (or any link) that is NOT the trigger navigates normally.
+        if (!onTrigger) return;
+
+        // If the trigger is itself a real link (has a usable href), let it
+        // navigate rather than hijacking the click to toggle.
+        const triggerHref = trigger.tagName === 'A' ? trigger.getAttribute('href') : null;
+        const triggerNavigates = triggerHref && triggerHref !== '#!' && !triggerHref.startsWith('#');
+
+        if (!submenu || triggerNavigates) return;
+
+        // Menu-only trigger: prevent any default and toggle the mega-menu.
+        e.preventDefault();
+        const expanded = navSection.getAttribute('aria-expanded') === 'true';
+        if (isDesktop.matches) toggleAllNavSections(navSections);
+        navSection.setAttribute('aria-expanded', expanded ? 'false' : 'true');
       });
     });
 

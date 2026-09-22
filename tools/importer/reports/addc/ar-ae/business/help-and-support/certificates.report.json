@@ -1,0 +1,16 @@
+{
+  "status": "success",
+  "url": "https://taqadistribution.com/addc/ar-ae/business/help-and-support/certificates",
+  "path": "addc/ar-ae/business/help-and-support/certificates",
+  "timestamp": "2026-09-22T11:35:27.674Z",
+  "title": "TAQA Distribution",
+  "template": "help-and-support",
+  "blocks": [
+    "hero-support",
+    "cards-quicklink",
+    "accordion-faq",
+    "carousel-tips",
+    "carousel-tips",
+    "cards-support"
+  ]
+}
