@@ -1,25 +1,28 @@
 # location-map
 
 Renders an interactive map above the location list on the
-`/locations/branches` and `/locations/partners` pages using **Leaflet +
-OpenStreetMap**. On the branches page, clicking a location card pans and zooms
-the map to that pin and opens its popup. Works in English and Arabic (RTL) —
-pins and popups use the language of the page.
+`/locations/branches` and `/locations/partners` pages using **MapLibre GL +
+OpenFreeMap** vector tiles. On the branches page, clicking a location card pans
+and zooms the map to that pin and opens its popup. Works in English and Arabic
+(RTL) — pins and popups use the language of the page.
 
 The block is synthesized automatically (see `buildLocationMap` in
 `scripts/scripts.js`); it is not authored into the page.
 
 ## No API key required
 
-Leaflet and OpenStreetMap tiles are free and open — **no account, API key, or
+MapLibre GL and OpenFreeMap tiles are free and open — **no account, API key, or
 billing is needed**, and the map renders as soon as the code is deployed.
-Leaflet is loaded on demand from the unpkg CDN. If the library or tiles are
-unavailable, the block removes itself and the page shows the plain location
-list, so nothing breaks.
+MapLibre GL is loaded on demand from the unpkg CDN; the vector tiles come from
+OpenFreeMap (`https://tiles.openfreemap.org/styles/liberty`). If the library or
+tiles are unavailable, the block removes itself and the page shows the plain
+location list, so nothing breaks.
 
-> Note: OpenStreetMap's public tile server is fine for this traffic. If usage
-> grows, point the `L.tileLayer(...)` URL in `location-map.js` at a dedicated
-> tile provider (e.g. a free MapTiler/Stadia Maps key) — no other change needed.
+> Note: OpenFreeMap permits production use and has no rate limits, unlike
+> OpenStreetMap's raster tile servers (which block production traffic). To
+> change the look or provider, edit `MAP_STYLE` in `location-map.js` — any
+> MapLibre style URL works (e.g. a free MapTiler/Stadia key if you ever want a
+> provider SLA).
 
 ## Coordinates (`locations.json`)
 
