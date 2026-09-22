@@ -1,43 +1,47 @@
 /*
  * Location Map Block
  * Renders an interactive map beside the location list on the branches /
- * partners pages using Leaflet + OpenStreetMap. Clicking a location card
- * pans/zooms the map to that pin and opens its popup. Works in English and
- * Arabic (RTL) — pins and popups use the language of the page.
+ * partners pages using MapLibre GL + OpenFreeMap vector tiles. Clicking a
+ * location card pans/zooms the map to that pin and opens its popup. Works in
+ * English and Arabic (RTL) — pins and popups use the language of the page.
  *
- * Leaflet is loaded from a CDN on demand; no API key, account, or billing is
- * required. The pin coordinates ship in locations.json alongside this block.
+ * MapLibre GL is loaded from a CDN on demand and OpenFreeMap serves the vector
+ * tiles; no API key, account, or billing is required, and OpenFreeMap permits
+ * production use (unlike OpenStreetMap's raster tile servers). The pin
+ * coordinates ship in locations.json alongside this block.
  */
 
-const LEAFLET_VERSION = '1.9.4';
-const LEAFLET_JS = `https://unpkg.com/leaflet@${LEAFLET_VERSION}/dist/leaflet.js`;
-const LEAFLET_CSS = `https://unpkg.com/leaflet@${LEAFLET_VERSION}/dist/leaflet.css`;
+const MAPLIBRE_VERSION = '4.7.1';
+const MAPLIBRE_JS = `https://unpkg.com/maplibre-gl@${MAPLIBRE_VERSION}/dist/maplibre-gl.js`;
+const MAPLIBRE_CSS = `https://unpkg.com/maplibre-gl@${MAPLIBRE_VERSION}/dist/maplibre-gl.css`;
+const MAP_STYLE = 'https://tiles.openfreemap.org/styles/liberty';
 
-// Center + zoom that frames the Abu Dhabi emirate (covers Al Ain to Al Dhafra).
-const DEFAULT_CENTER = [24.0, 54.0];
-const DEFAULT_ZOOM = 7;
+// Center ([lng, lat] for MapLibre) + zoom that frames the Abu Dhabi emirate
+// (covers Al Ain to Al Dhafra).
+const DEFAULT_CENTER = [54.0, 24.0];
+const DEFAULT_ZOOM = 6.5;
 
-let leafletLoader;
-/** Load the Leaflet library (JS + CSS) once, resolving with `window.L`. */
-function loadLeaflet() {
-  if (window.L) return Promise.resolve(window.L);
-  if (!leafletLoader) {
-    leafletLoader = new Promise((resolve, reject) => {
-      if (!document.querySelector(`link[href="${LEAFLET_CSS}"]`)) {
+let maplibreLoader;
+/** Load the MapLibre GL library (JS + CSS) once, resolving with `window.maplibregl`. */
+function loadMapLibre() {
+  if (window.maplibregl) return Promise.resolve(window.maplibregl);
+  if (!maplibreLoader) {
+    maplibreLoader = new Promise((resolve, reject) => {
+      if (!document.querySelector(`link[href="${MAPLIBRE_CSS}"]`)) {
         const link = document.createElement('link');
         link.rel = 'stylesheet';
-        link.href = LEAFLET_CSS;
+        link.href = MAPLIBRE_CSS;
         document.head.append(link);
       }
       const script = document.createElement('script');
-      script.src = LEAFLET_JS;
+      script.src = MAPLIBRE_JS;
       script.async = true;
-      script.onload = () => resolve(window.L);
-      script.onerror = () => reject(new Error('Leaflet failed to load'));
+      script.onload = () => resolve(window.maplibregl);
+      script.onerror = () => reject(new Error('MapLibre GL failed to load'));
       document.head.append(script);
     });
   }
-  return leafletLoader;
+  return maplibreLoader;
 }
 
 const normalize = (s) => (s || '').replace(/\s+/g, ' ').trim().toLowerCase();
@@ -86,34 +90,42 @@ export default async function decorate(block) {
   block.textContent = '';
   block.append(canvas);
 
-  let L;
+  let maplibregl;
   try {
-    L = await loadLeaflet();
+    maplibregl = await loadMapLibre();
   } catch {
-    // Tiles/library unavailable — fall back to the plain list.
+    // Library/tiles unavailable — fall back to the plain list.
     block.remove();
     return;
   }
 
-  const map = L.map(canvas, { scrollWheelZoom: false }).setView(DEFAULT_CENTER, DEFAULT_ZOOM);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    maxZoom: 19,
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-  }).addTo(map);
+  const map = new maplibregl.Map({
+    container: canvas,
+    style: MAP_STYLE,
+    center: DEFAULT_CENTER,
+    zoom: DEFAULT_ZOOM,
+    attributionControl: { compact: true },
+  });
+  map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-left');
+  map.scrollZoom.disable();
 
   const approxNote = arabic ? 'موقع تقريبي' : 'Approximate location';
   const markersByName = new Map();
-  const latlngs = [];
+  const bounds = new maplibregl.LngLatBounds();
   points.forEach((p) => {
     const label = labelFor(p, arabic);
-    const marker = L.marker([p.lat, p.lng]).addTo(map);
     const suffix = p.approx ? `<br><em>${approxNote}</em>` : '';
-    marker.bindPopup(`<strong>${label}</strong>${suffix}`);
-    markersByName.set(normalize(label), marker);
-    latlngs.push([p.lat, p.lng]);
+    const popup = new maplibregl.Popup({ offset: 24 })
+      .setHTML(`<strong>${label}</strong>${suffix}`);
+    const marker = new maplibregl.Marker({ color: '#6b42d1' })
+      .setLngLat([p.lng, p.lat])
+      .setPopup(popup)
+      .addTo(map);
+    markersByName.set(normalize(label), { marker, popup, lngLat: [p.lng, p.lat] });
+    bounds.extend([p.lng, p.lat]);
   });
-  if (latlngs.length > 1) map.fitBounds(latlngs, { padding: [30, 30] });
-  else map.setView(latlngs[0], 13);
+  if (points.length > 1) map.fitBounds(bounds, { padding: 40, maxZoom: 12, duration: 0 });
+  else map.setCenter([points[0].lng, points[0].lat]);
 
   // Link one location card to its map pin: clicking (or keyboard-activating)
   // the card focuses the pin and opens its popup. No-op if the card's name
@@ -121,15 +133,15 @@ export default async function decorate(block) {
   const wireCard = (li) => {
     if (li.dataset.mapLinked) return;
     const name = normalize(li.querySelector('h3')?.textContent);
-    const marker = markersByName.get(name);
-    if (!marker) return;
+    const entry = markersByName.get(name);
+    if (!entry) return;
     li.dataset.mapLinked = 'true';
     li.classList.add('location-map-linked');
     li.setAttribute('role', 'button');
     li.setAttribute('tabindex', '0');
     const focus = () => {
-      map.setView(marker.getLatLng(), Math.max(map.getZoom(), 13));
-      marker.openPopup();
+      map.flyTo({ center: entry.lngLat, zoom: Math.max(map.getZoom(), 12) });
+      if (!entry.popup.isOpen()) entry.marker.togglePopup();
       canvas.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     };
     li.addEventListener('click', focus);
@@ -152,6 +164,6 @@ export default async function decorate(block) {
   // Safety valve: stop observing after 10s regardless.
   setTimeout(() => observer.disconnect(), 10000);
 
-  // Leaflet measures the container on init; if it was hidden/resized, correct it.
-  requestAnimationFrame(() => map.invalidateSize());
+  // MapLibre measures the container on init; if it was hidden/resized, correct it.
+  requestAnimationFrame(() => map.resize());
 }

@@ -1,4 +1,4 @@
-/* ===== location-map — interactive branch/partner map (Leaflet + OSM) =====
+/* ===== location-map — interactive branch/partner map (MapLibre + OpenFreeMap) =====
    Sits above the location cards. Mobile-first: full-width map, fixed height. */
 
 .location-map {
@@ -14,12 +14,12 @@
   background: #e8eaed; /* neutral fill while tiles load */
 }
 
-/* Leaflet controls/popups pick up the site font. */
-.location-map-canvas .leaflet-container {
+/* MapLibre controls/popups pick up the site font. */
+.location-map-canvas .maplibregl-map {
   font-family: var(--body-font-family);
 }
 
-.location-map-canvas .leaflet-popup-content strong {
+.location-map-canvas .maplibregl-popup-content strong {
   color: var(--taqa-navy, #00093f);
 }
 
