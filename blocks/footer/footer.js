@@ -39,9 +39,12 @@ export default async function decorate(block) {
 
   const sections = [...footer.children];
 
-  // Apps section: the "Download our apps" block with app-store image links.
-  const appsSection = sections.find((s) => /download our apps/i.test(s.textContent)
-    && s.querySelector('img'));
+  // Apps section: the block with the app-store download links. Detected by the
+  // store URLs (language-agnostic) rather than the heading text, so it also
+  // matches the Arabic footer ("حمّل تطبيقاتنا"), not just "Download our apps".
+  const isAppStoreLink = (a) => /apps\.apple\.com|play\.google\.com/i.test(a.getAttribute('href') || '');
+  const appsSection = sections.find((s) => s.querySelector('img')
+    && [...s.querySelectorAll('a')].some(isAppStoreLink));
   if (appsSection) appsSection.classList.add('footer-apps');
 
   // Logo panel: images only, no links (the teal gradient brand panel).
