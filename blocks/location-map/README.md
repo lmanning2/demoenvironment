@@ -1,33 +1,25 @@
 # location-map
 
-Renders an interactive Google Map above the location list on the
-`/locations/branches` and `/locations/partners` pages. Pins come from the
-shipped `locations.json`; on the branches page, clicking a location card pans
-and zooms the map to that pin and opens its popup. Works in English and Arabic
-(RTL) — pins and popups use the language of the page.
+Renders an interactive map above the location list on the
+`/locations/branches` and `/locations/partners` pages using **Leaflet +
+OpenStreetMap**. On the branches page, clicking a location card pans and zooms
+the map to that pin and opens its popup. Works in English and Arabic (RTL) —
+pins and popups use the language of the page.
 
 The block is synthesized automatically (see `buildLocationMap` in
 `scripts/scripts.js`); it is not authored into the page.
 
-## Enabling the map (Google Maps API key)
+## No API key required
 
-The map needs a Google Maps JavaScript API key. **Without a key the block
-removes itself and the page shows the plain location list** — nothing breaks.
+Leaflet and OpenStreetMap tiles are free and open — **no account, API key, or
+billing is needed**, and the map renders as soon as the code is deployed.
+Leaflet is loaded on demand from the unpkg CDN. If the library or tiles are
+unavailable, the block removes itself and the page shows the plain location
+list, so nothing breaks.
 
-The key is read from page metadata, so it lives in the authored content, never
-in code. To turn the map on:
-
-1. In the Google Cloud console, create an API key with the **Maps JavaScript
-   API** enabled.
-2. Restrict it to **HTTP referrers** for the site's domains, e.g.
-   `*.aem.page/*`, `*.aem.live/*`, and the production domain. A referrer-
-   restricted browser key is safe to expose in client-side code.
-3. Add the key to the pages' metadata as **`maps-api-key`**. In Document
-   Authoring, add a page metadata row with key `maps-api-key` and the key as
-   the value (site-wide metadata works too, so both locations pages inherit it).
-
-The block reads `<meta name="maps-api-key">`. As a local dev fallback it also
-accepts `window.TAQA_MAPS_KEY`.
+> Note: OpenStreetMap's public tile server is fine for this traffic. If usage
+> grows, point the `L.tileLayer(...)` URL in `location-map.js` at a dedicated
+> tile provider (e.g. a free MapTiler/Stadia Maps key) — no other change needed.
 
 ## Coordinates (`locations.json`)
 

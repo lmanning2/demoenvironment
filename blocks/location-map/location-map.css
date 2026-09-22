@@ -1,4 +1,4 @@
-/* ===== location-map — interactive branch/partner map =====
+/* ===== location-map — interactive branch/partner map (Leaflet + OSM) =====
    Sits above the location cards. Mobile-first: full-width map, fixed height. */
 
 .location-map {
@@ -11,6 +11,16 @@
   border-radius: 8px;
   overflow: hidden;
   border: 1px solid rgb(172 174 185 / 40%);
+  background: #e8eaed; /* neutral fill while tiles load */
+}
+
+/* Leaflet controls/popups pick up the site font. */
+.location-map-canvas .leaflet-container {
+  font-family: var(--body-font-family);
+}
+
+.location-map-canvas .leaflet-popup-content strong {
+  color: var(--taqa-navy, #00093f);
 }
 
 /* Location cards that are linked to a map pin get an affordance. */
@@ -21,11 +31,6 @@
 .cards-location .location-map-linked:focus-visible {
   outline: 2px solid var(--taqa-purple, #6b42d1);
   outline-offset: 2px;
-}
-
-/* Google InfoWindow content uses the site font. */
-.location-map-canvas .gm-style .gm-style-iw {
-  font-family: var(--body-font-family);
 }
 
 /* ===== TABLET/DESKTOP (>= 900px) ===== */

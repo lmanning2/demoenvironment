@@ -1,42 +1,43 @@
 /*
  * Location Map Block
- * Renders an interactive Google Map beside the location list on the branches /
- * partners pages. Pins come from a shipped coordinate file (locations.json);
- * clicking a location card pans/zooms the map to that pin and opens its popup.
+ * Renders an interactive map beside the location list on the branches /
+ * partners pages using Leaflet + OpenStreetMap. Clicking a location card
+ * pans/zooms the map to that pin and opens its popup. Works in English and
+ * Arabic (RTL) — pins and popups use the language of the page.
  *
- * The Google Maps API key is read from page metadata (`maps-api-key`) so it
- * lives in the authored content, never in code. It must be a browser key that
- * is HTTP-referrer-restricted to the site's domains. When no key is present the
- * block degrades to the plain list (no map), so pages never break.
+ * Leaflet is loaded from a CDN on demand; no API key, account, or billing is
+ * required. The pin coordinates ship in locations.json alongside this block.
  */
 
-const MAPS_KEY = () => (
-  document.querySelector('meta[name="maps-api-key"]')?.content
-  || window.TAQA_MAPS_KEY
-  || ''
-).trim();
+const LEAFLET_VERSION = '1.9.4';
+const LEAFLET_JS = `https://unpkg.com/leaflet@${LEAFLET_VERSION}/dist/leaflet.js`;
+const LEAFLET_CSS = `https://unpkg.com/leaflet@${LEAFLET_VERSION}/dist/leaflet.css`;
 
 // Center + zoom that frames the Abu Dhabi emirate (covers Al Ain to Al Dhafra).
-const DEFAULT_CENTER = { lat: 24.0, lng: 54.0 };
+const DEFAULT_CENTER = [24.0, 54.0];
 const DEFAULT_ZOOM = 7;
 
-let mapsLoader;
-/** Load the Google Maps JS API once, resolving when `google.maps` is ready. */
-function loadGoogleMaps(key) {
-  if (window.google?.maps) return Promise.resolve(window.google.maps);
-  if (!mapsLoader) {
-    mapsLoader = new Promise((resolve, reject) => {
-      const cb = `__taqaMapsInit_${Date.now()}`;
-      window[cb] = () => resolve(window.google.maps);
+let leafletLoader;
+/** Load the Leaflet library (JS + CSS) once, resolving with `window.L`. */
+function loadLeaflet() {
+  if (window.L) return Promise.resolve(window.L);
+  if (!leafletLoader) {
+    leafletLoader = new Promise((resolve, reject) => {
+      if (!document.querySelector(`link[href="${LEAFLET_CSS}"]`)) {
+        const link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = LEAFLET_CSS;
+        document.head.append(link);
+      }
       const script = document.createElement('script');
+      script.src = LEAFLET_JS;
       script.async = true;
-      script.defer = true;
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}&callback=${cb}&loading=async`;
-      script.onerror = () => reject(new Error('Google Maps failed to load'));
+      script.onload = () => resolve(window.L);
+      script.onerror = () => reject(new Error('Leaflet failed to load'));
       document.head.append(script);
     });
   }
-  return mapsLoader;
+  return leafletLoader;
 }
 
 const normalize = (s) => (s || '').replace(/\s+/g, ' ').trim().toLowerCase();
@@ -71,22 +72,13 @@ function labelFor(point, arabic) {
 }
 
 export default async function decorate(block) {
-  const key = MAPS_KEY();
   // The location cards are rendered by the sibling cards-location block.
   const section = block.closest('.section') || block.parentElement;
-  const cardsList = section?.querySelector('.cards-location ul')
-    || document.querySelector('.cards-location ul');
-
-  if (!key) {
-    // No key configured — leave the list as the only UI and remove the empty
-    // map shell so nothing looks broken.
-    block.remove();
-    return;
-  }
 
   const arabic = isArabicPage();
   const data = await loadCoords();
-  const points = data[datasetForPage()] || [];
+  const points = (data[datasetForPage()] || [])
+    .filter((p) => typeof p.lat === 'number' && typeof p.lng === 'number');
   if (!points.length) { block.remove(); return; }
 
   const canvas = document.createElement('div');
@@ -94,60 +86,72 @@ export default async function decorate(block) {
   block.textContent = '';
   block.append(canvas);
 
-  let maps;
+  let L;
   try {
-    maps = await loadGoogleMaps(key);
+    L = await loadLeaflet();
   } catch {
+    // Tiles/library unavailable — fall back to the plain list.
     block.remove();
     return;
   }
 
-  const map = new maps.Map(canvas, {
-    center: DEFAULT_CENTER,
-    zoom: DEFAULT_ZOOM,
-    mapTypeControl: false,
-    streetViewControl: false,
-    fullscreenControl: true,
-  });
-  const bounds = new maps.LatLngBounds();
-  const info = new maps.InfoWindow();
-  const markersByName = new Map();
+  const map = L.map(canvas, { scrollWheelZoom: false }).setView(DEFAULT_CENTER, DEFAULT_ZOOM);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+  }).addTo(map);
 
   const approxNote = arabic ? 'موقع تقريبي' : 'Approximate location';
+  const markersByName = new Map();
+  const latlngs = [];
   points.forEach((p) => {
-    if (typeof p.lat !== 'number' || typeof p.lng !== 'number') return;
     const label = labelFor(p, arabic);
-    const marker = new maps.Marker({ position: { lat: p.lat, lng: p.lng }, map, title: label });
+    const marker = L.marker([p.lat, p.lng]).addTo(map);
     const suffix = p.approx ? `<br><em>${approxNote}</em>` : '';
-    marker.addListener('click', () => {
-      info.setContent(`<strong>${label}</strong>${suffix}`);
-      info.open(map, marker);
-    });
-    // Key by the language-appropriate label so cards on this page can match.
+    marker.bindPopup(`<strong>${label}</strong>${suffix}`);
     markersByName.set(normalize(label), marker);
-    bounds.extend(marker.getPosition());
+    latlngs.push([p.lat, p.lng]);
   });
-  if (!bounds.isEmpty()) map.fitBounds(bounds);
+  if (latlngs.length > 1) map.fitBounds(latlngs, { padding: [30, 30] });
+  else map.setView(latlngs[0], 13);
 
-  // Wire each location card to focus its pin on the map.
-  if (cardsList) {
-    cardsList.querySelectorAll(':scope > li').forEach((li) => {
-      const name = normalize(li.querySelector('h3')?.textContent);
-      const marker = markersByName.get(name);
-      if (!marker) return;
-      li.classList.add('location-map-linked');
-      li.setAttribute('role', 'button');
-      li.setAttribute('tabindex', '0');
-      const focus = () => {
-        map.panTo(marker.getPosition());
-        map.setZoom(Math.max(map.getZoom(), 13));
-        maps.event.trigger(marker, 'click');
-        canvas.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      };
-      li.addEventListener('click', focus);
-      li.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); focus(); }
-      });
+  // Link one location card to its map pin: clicking (or keyboard-activating)
+  // the card focuses the pin and opens its popup. No-op if the card's name
+  // has no matching pin, or if it was already wired.
+  const wireCard = (li) => {
+    if (li.dataset.mapLinked) return;
+    const name = normalize(li.querySelector('h3')?.textContent);
+    const marker = markersByName.get(name);
+    if (!marker) return;
+    li.dataset.mapLinked = 'true';
+    li.classList.add('location-map-linked');
+    li.setAttribute('role', 'button');
+    li.setAttribute('tabindex', '0');
+    const focus = () => {
+      map.setView(marker.getLatLng(), Math.max(map.getZoom(), 13));
+      marker.openPopup();
+      canvas.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    };
+    li.addEventListener('click', focus);
+    li.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); focus(); }
     });
-  }
+  };
+
+  // The cards-location block decorates independently and may finish before or
+  // after this one, so we can't rely on a fixed wait. Wire whatever cards exist
+  // now, then observe the section for cards that appear later.
+  const wireAll = (root) => root.querySelectorAll('.cards-location ul > li').forEach(wireCard);
+  const scope = section || document;
+  wireAll(scope);
+  const observer = new MutationObserver(() => {
+    wireAll(scope);
+    if (scope.querySelector('.cards-location ul > li')) observer.disconnect();
+  });
+  observer.observe(scope, { childList: true, subtree: true });
+  // Safety valve: stop observing after 10s regardless.
+  setTimeout(() => observer.disconnect(), 10000);
+
+  // Leaflet measures the container on init; if it was hidden/resized, correct it.
+  requestAnimationFrame(() => map.invalidateSize());
 }
