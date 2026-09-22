@@ -108,5 +108,16 @@ export default function transform(hookName, element, payload) {
       el.removeAttribute('data-aos-duration');
       el.removeAttribute('data-aos-delay');
     });
+
+    // Some source anchors carry a stray leading/trailing space in the href
+    // (e.g. `href=" https://www.addc.ae/..."`). Left as-is, the space is
+    // percent-encoded to `%20` and the DA publish step then rewrites the whole
+    // value into a broken internal path (`/https/www-addc-ae/...`). Trim
+    // surrounding whitespace so the href stays a clean absolute URL.
+    element.querySelectorAll('a[href]').forEach((a) => {
+      const href = a.getAttribute('href');
+      const trimmed = href.trim();
+      if (trimmed !== href) a.setAttribute('href', trimmed);
+    });
   }
 }
