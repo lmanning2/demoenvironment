@@ -66,16 +66,19 @@ function absorbLeakedFilters(block) {
 }
 
 /**
- * The source loads each FAQ answer from its own widget only when expanded, so
- * imported pages capture empty answer cells. A shared answers file
- * (faq-answers.json in this block folder, with { en: {...}, ar: {...} } maps of
- * question → answer text) backfills them at render time, keyed by the question
- * text. Shipping it as a code asset (not DA content) keeps it version
- * controlled and served on every environment.
- * @returns {Promise<Object>} map of question → answer text for the page locale
+ * The source loads FAQ answers from a widget only on expand, and paginates the
+ * question list behind a LOAD MORE button, so imported pages capture only the
+ * first few questions with empty answer cells. A shared data file
+ * (faq-answers.json in this block folder) holds:
+ *   { en: {question→answer}, ar: {question→answer},
+ *     pages: { "<path>": ["question", ...] } }
+ * so the block can both backfill answers and restore the full ordered question
+ * list. Shipped as a code asset (not DA content) so it's version controlled and
+ * served on every environment.
+ * @returns {Promise<Object>} the parsed data file ({} on failure)
  */
 let faqAnswersPromise;
-async function loadFaqAnswers() {
+async function loadFaqData() {
   if (!faqAnswersPromise) {
     faqAnswersPromise = (async () => {
       const base = `${window.hlx?.codeBasePath || ''}/blocks/accordion-faq/faq-answers.json`;
@@ -84,20 +87,48 @@ async function loadFaqAnswers() {
       return resp.json().catch(() => ({}));
     })();
   }
-  const data = await faqAnswersPromise;
-  const isArabic = /\/ar(-[a-z]{2})?\//i.test(window.location.pathname);
-  return (isArabic ? data.ar : data.en) || {};
+  return faqAnswersPromise;
 }
 
 const normalizeQ = (s) => (s || '').replace(/\s+/g, ' ').trim().toLowerCase();
+
+/** Resolve the full question list for the current page path, if we have one. */
+function pageQuestions(data) {
+  const pages = data.pages || {};
+  const path = window.location.pathname.replace(/\.html$/, '');
+  if (pages[path]) return pages[path];
+  // Match by suffix so localhost's /content prefix or trailing slashes still map.
+  const key = Object.keys(pages).find((p) => path.endsWith(p) || p.endsWith(path));
+  return key ? pages[key] : null;
+}
 
 export default async function decorate(block) {
   // Categories authored on the questions themselves take priority; otherwise
   // fall back to any leaked filter labels sitting before the block.
   const leakedCategories = absorbLeakedFilters(block);
 
+  // Helper: build one <details> item from a question + answer text.
+  const makeItem = (question, answerText, category) => {
+    const summary = document.createElement('summary');
+    summary.className = 'accordion-faq-item-label';
+    summary.textContent = question;
+    const body = document.createElement('div');
+    body.className = 'accordion-faq-item-body';
+    if (answerText) {
+      const p = document.createElement('p');
+      p.textContent = answerText;
+      body.append(p);
+    }
+    const details = document.createElement('details');
+    details.className = 'accordion-faq-item';
+    if (category) details.dataset.category = category;
+    details.dataset.question = question;
+    details.append(summary, body);
+    return details;
+  };
+
   // Build the <details> items from the authored rows.
-  const items = [...block.children].map((row) => {
+  let items = [...block.children].map((row) => {
     const label = row.children[0];
     const bodyCell = row.children[1];
     const categoryCell = row.children[2];
@@ -113,25 +144,39 @@ export default async function decorate(block) {
     const details = document.createElement('details');
     details.className = 'accordion-faq-item';
     if (category) details.dataset.category = category;
-    // Remember the question text so we can backfill an empty answer body.
     details.dataset.question = summary.textContent.trim();
     details.append(summary, body);
     return details;
   });
 
-  // Backfill empty answer bodies from the shared answers file.
-  const answersEmpty = items.filter((it) => !it.querySelector('.accordion-faq-item-body').textContent.trim());
-  if (answersEmpty.length) {
-    const answers = await loadFaqAnswers();
-    const byQ = {};
-    Object.keys(answers).forEach((q) => { byQ[normalizeQ(q)] = answers[q]; });
-    answersEmpty.forEach((it) => {
-      const ans = byQ[normalizeQ(it.dataset.question)];
-      if (ans) {
-        const body = it.querySelector('.accordion-faq-item-body');
-        const p = document.createElement('p');
-        p.textContent = ans;
-        body.append(p);
+  // Restore the full question list + answers from the shared data file. The
+  // source paginates the FAQ behind LOAD MORE, so imports only captured the
+  // first few questions; rebuild the complete ordered set for this page.
+  const data = await loadFaqData();
+  const isArabic = /\/ar(-[a-z]{2})?\//i.test(window.location.pathname);
+  const answers = (isArabic ? data.ar : data.en) || {};
+  const byQ = {};
+  Object.keys(answers).forEach((q) => { byQ[normalizeQ(q)] = answers[q]; });
+
+  const fullList = pageQuestions(data);
+  if (fullList && fullList.length > items.length) {
+    // Preserve any category already on the imported items (keyed by question).
+    const catByQ = {};
+    items.forEach((it) => {
+      if (it.dataset.category) catByQ[normalizeQ(it.dataset.question)] = it.dataset.category;
+    });
+    items = fullList.map((q) => makeItem(q, byQ[normalizeQ(q)] || '', catByQ[normalizeQ(q)]));
+  } else {
+    // No fuller list — just backfill empty answers on the imported items.
+    items.forEach((it) => {
+      const body = it.querySelector('.accordion-faq-item-body');
+      if (!body.textContent.trim()) {
+        const ans = byQ[normalizeQ(it.dataset.question)];
+        if (ans) {
+          const p = document.createElement('p');
+          p.textContent = ans;
+          body.append(p);
+        }
       }
     });
   }
