@@ -1,0 +1,12 @@
+{
+  "status": "success",
+  "url": "https://taqadistribution.com/addc/en-us/business/locations/partners",
+  "path": "addc/en-us/business/locations/partners",
+  "timestamp": "2026-09-22T06:47:29.304Z",
+  "title": "TAQA Distribution",
+  "template": "locations",
+  "blocks": [
+    "hero-text",
+    "cards-support"
+  ]
+}

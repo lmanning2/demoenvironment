@@ -93,17 +93,31 @@ function toggleMenu(nav, navSections, forceExpanded = null) {
 }
 
 /**
- * Fetch the nav fragment. Localhost / aem up serves it at /content/nav.plain.html;
- * DA/EDS production serves it at `${navPath}.plain.html`.
+ * Fetch the nav fragment. Arabic pages (under an `ar-ae`/`ar` path) use the
+ * Arabic nav; everything else uses the default English nav. Localhost / aem up
+ * serves fragments at /content/<name>.plain.html; DA/EDS production serves them
+ * at /<name>.plain.html.
  * @param {string} navPath
  * @returns {Promise<string>}
  */
 async function fetchNav(navPath) {
-  let resp = await fetch('/content/nav.plain.html');
-  if (!resp.ok) {
-    resp = await fetch(`${navPath}.plain.html`);
+  const isArabic = /\/ar(-[a-z]{2})?\//i.test(window.location.pathname);
+  const name = isArabic ? 'nav-ar' : 'nav';
+  // Try the locale fragment first (content dir, then site root), then fall back
+  // to the default nav / the metadata-provided path.
+  const candidates = [
+    `/content/${name}.plain.html`,
+    `/${name}.plain.html`,
+    '/content/nav.plain.html',
+    `${navPath}.plain.html`,
+  ];
+  // eslint-disable-next-line no-restricted-syntax
+  for (const url of candidates) {
+    // eslint-disable-next-line no-await-in-loop
+    const resp = await fetch(url);
+    if (resp.ok) return resp.text();
   }
-  return resp.ok ? resp.text() : '';
+  return '';
 }
 
 /**

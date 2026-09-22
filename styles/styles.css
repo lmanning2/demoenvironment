@@ -485,3 +485,15 @@ main .section.faq-two-column .faq-col-side {
     padding: 0 32px;
   }
 }
+
+/* ===== RTL (Arabic) =====
+   Arabic pages set <html dir="rtl"> in scripts.js. Flexbox/grid layouts mirror
+   automatically; these rules fix the text direction and the few places that
+   use physical (left/right) properties. */
+[dir="rtl"] body {
+  text-align: right;
+}
+
+[dir="rtl"] main > .section > div {
+  text-align: right;
+}

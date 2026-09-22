@@ -1,0 +1,65 @@
+/* ===== cards-location — branch / partner location cards =====
+   A responsive grid of location cards, each with a name, address, and phone.
+   Mobile-first. */
+
+.cards-location > ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.cards-location > ul > li {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 20px 22px;
+  border: 1px solid rgb(172 174 185 / 40%);
+  border-radius: 8px;
+  background: #fff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cards-location > ul > li:hover {
+  border-color: var(--taqa-purple, #6b42d1);
+  box-shadow: 0 4px 14px rgb(0 0 0 / 8%);
+}
+
+.cards-location h3 {
+  margin: 0 0 8px;
+  font-family: var(--heading-font-family);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--taqa-navy, #00093f);
+}
+
+.cards-location p {
+  margin: 0 0 6px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-color, #1a1a1d);
+}
+
+.cards-location p:last-child {
+  margin-bottom: 0;
+}
+
+.cards-location a {
+  color: var(--taqa-purple, #6b42d1);
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.cards-location a:hover {
+  color: var(--taqa-navy, #00093f);
+}
+
+/* ===== DESKTOP (>= 900px) ===== */
+@media (width >= 900px) {
+  .cards-location > ul {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+}

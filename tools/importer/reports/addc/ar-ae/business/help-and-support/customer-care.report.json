@@ -1,0 +1,16 @@
+{
+  "status": "success",
+  "url": "https://taqadistribution.com/addc/ar-ae/business/help-and-support/customer-care",
+  "path": "addc/ar-ae/business/help-and-support/customer-care",
+  "timestamp": "2026-09-22T06:51:42.220Z",
+  "title": "TAQA Distribution",
+  "template": "help-and-support",
+  "blocks": [
+    "hero-support",
+    "cards-quicklink",
+    "accordion-faq",
+    "carousel-tips",
+    "carousel-tips",
+    "cards-support"
+  ]
+}

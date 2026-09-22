@@ -1,0 +1,12 @@
+{
+  "status": "success",
+  "url": "https://taqadistribution.com/addc/ar-ae/business/locations/branches",
+  "path": "addc/ar-ae/business/locations/branches",
+  "timestamp": "2026-09-22T06:53:02.465Z",
+  "title": "TAQA Distribution",
+  "template": "locations",
+  "blocks": [
+    "hero-text",
+    "cards-support"
+  ]
+}

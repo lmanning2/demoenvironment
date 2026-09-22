@@ -21,10 +21,15 @@ function iconFor(href) {
  * @param {Element} block The footer block element
  */
 export default async function decorate(block) {
-  // metadata-independent: /content first (localhost), then root (DA/EDS prod)
-  let fragment = await loadFragment('/content/footer');
-  if (!fragment) {
-    fragment = await loadFragment('/footer');
+  // Arabic pages (under an `ar-ae`/`ar` path) use the Arabic footer; everything
+  // else uses the default English footer. metadata-independent: try /content
+  // first (localhost), then root (DA/EDS prod); fall back to the English footer.
+  const isArabic = /\/ar(-[a-z]{2})?\//i.test(window.location.pathname);
+  const name = isArabic ? 'footer-ar' : 'footer';
+  let fragment = await loadFragment(`/content/${name}`)
+    || await loadFragment(`/${name}`);
+  if (!fragment && isArabic) {
+    fragment = await loadFragment('/content/footer') || await loadFragment('/footer');
   }
   if (!fragment) return;
 

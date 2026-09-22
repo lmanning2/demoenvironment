@@ -148,6 +148,15 @@ function buildFaqTwoColumn(main) {
 
     section.append(mainCol, sideCol);
     section.classList.add('faq-two-column');
+
+    // The "We are here to help" list imports each item with a literal "•"
+    // paragraph plus the CSS list marker, showing two bullets. Drop the literal
+    // bullet paragraphs so only the styled marker remains.
+    sideCol.querySelectorAll('li').forEach((li) => {
+      [...li.querySelectorAll(':scope > p')].forEach((p) => {
+        if (p.textContent.trim() === '•') p.remove();
+      });
+    });
   });
 }
 
@@ -186,6 +195,100 @@ function buildAppPromo(main) {
   const block = buildBlock('app-promo', { elems: nodes.map((n) => n.cloneNode(true)) });
   nodes[0].replaceWith(block);
   nodes.slice(1).forEach((n) => n.remove());
+}
+
+/**
+ * Locations pages carry a branch/partner finder whose cards render
+ * asynchronously (behind a map), so they import as a flat run of loose
+ * paragraphs: a "Find a location" heading, an "All services" filter label, an
+ * "N locations found" count, then repeating [name, address, phone, "More"] per
+ * location. Group those into a `cards-location` block. Runs before
+ * decorateSections so it operates on the raw section divs.
+ * @param {Element} main The container element
+ */
+function buildLocationCards(main) {
+  if (main !== document.querySelector('main')) return;
+  // The finder heading is "Find a location" (EN) or "ابحث عن مركز..." (AR).
+  const headingRe = /^(find a location|ابحث عن مر(كز|اكز))/i;
+  const heading = [...main.querySelectorAll('h1, h2, h3, h4, h5, h6, p')].find(
+    (el) => headingRe.test(el.textContent.trim()),
+  );
+  if (!heading || heading.closest('.cards-location')) return;
+
+  // Filter / count chrome to skip (EN + AR): "All services"/"جميع الخدمات",
+  // "N locations found"/"تم العثور على N مواقع".
+  const filterRe = /^(find a location|all services|\d+\s+locations?\s+found|filter|search|جميع الخدمات|تم العثور على|ابحث عن)/i;
+  // The card boundary is a trailing "More" (EN) or "أكثر" (AR) line.
+  const moreRe = /^(more|أكثر)$/i;
+  // A contact line: a "Tel:"/phone label, or a mostly-numeric short string.
+  const phoneRe = /^(tel:|fax:|\+?\d[\d\s-]{4,}\d)$/i;
+  // Map widget chrome that can leak in after the real cards — hard stop.
+  const mapNoiseRe = /(move right|keyboard shortcut|map data|jump left|zoom in|google maps|drag with keyboard|toggle between metric)/i;
+
+  // Collect sibling text lines from the heading up to the next block/app-promo
+  // or the leaking Google-Maps chrome.
+  const consumed = [heading];
+  const lines = [];
+  let node = heading.nextElementSibling;
+  while (node) {
+    if (node.querySelector && node.querySelector('img')) break; // app badges / other block
+    const text = node.textContent.trim();
+    if (text === 'POWERING' || node.className?.includes?.('-wrapper')) break;
+    if (mapNoiseRe.test(text)) { consumed.push(node); break; }
+    consumed.push(node);
+    if (text && !filterRe.test(text)) lines.push(text);
+    node = node.nextElementSibling;
+  }
+
+  // Group lines into cards, splitting on the trailing "More" line. Within a
+  // card: first line = name, a phone/contact line if present, rest = address.
+  const rows = [];
+  let current = [];
+  const flush = () => {
+    if (!current.length) return;
+    const name = current[0];
+    const rest = current.slice(1);
+    // Prefer an explicit Tel:/phone line; else the last line that looks like a
+    // bare phone number (short, no letters).
+    let phoneIdx = rest.findIndex((t) => /^(tel:|fax:)/i.test(t) || /^\+?[\d][\d\s-]{4,}\d$/.test(t));
+    if (phoneIdx === -1) phoneIdx = rest.findIndex((t) => phoneRe.test(t));
+    const phone = phoneIdx >= 0 ? rest[phoneIdx] : '';
+    const address = rest.filter((t, i) => i !== phoneIdx).join(', ');
+    const cell = document.createElement('div');
+    const h = document.createElement('h3');
+    h.textContent = name;
+    cell.append(h);
+    if (address) {
+      const p = document.createElement('p');
+      p.textContent = address;
+      cell.append(p);
+    }
+    if (phone) {
+      const pPhone = document.createElement('p');
+      const digits = (phone.match(/\+?\d[\d-]{4,}/) || [])[0];
+      if (digits) {
+        const a = document.createElement('a');
+        a.href = `tel:${digits.replace(/[\s-]/g, '')}`;
+        a.textContent = phone;
+        pPhone.append(a);
+      } else {
+        pPhone.textContent = phone;
+      }
+      cell.append(pPhone);
+    }
+    rows.push([{ elems: [cell] }]);
+    current = [];
+  };
+  lines.forEach((t) => {
+    if (moreRe.test(t)) { flush(); return; }
+    current.push(t);
+  });
+  flush();
+  if (!rows.length) return;
+
+  const block = buildBlock('cards-location', rows);
+  heading.replaceWith(block);
+  consumed.slice(1).forEach((n) => n.remove());
 }
 
 /**
@@ -232,6 +335,7 @@ function buildAutoBlocks(main) {
   try {
     buildPageHero(main);
     buildAppPromo(main);
+    buildLocationCards(main);
     // auto load `*/fragments/*` references
     const fragments = [...main.querySelectorAll('a[href*="/fragments/"]')].filter((f) => !f.closest('.fragment'));
     if (fragments.length > 0) {
@@ -342,7 +446,11 @@ export function decorateMain(main) {
  * @param {Element} doc The container element
  */
 async function loadEager(doc) {
-  document.documentElement.lang = 'en';
+  // Arabic pages live under an `ar-ae` (or `ar`) path segment and must render
+  // right-to-left. Everything else is left-to-right English.
+  const isArabic = /\/ar(-[a-z]{2})?\//i.test(window.location.pathname);
+  document.documentElement.lang = isArabic ? 'ar' : 'en';
+  document.documentElement.dir = isArabic ? 'rtl' : 'ltr';
   decorateTemplateAndTheme();
   const main = doc.querySelector('main');
   if (main) {

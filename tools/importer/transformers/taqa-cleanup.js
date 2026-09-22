@@ -40,7 +40,24 @@ export default function transform(hookName, element, payload) {
       '.dameg-shadow-root-host',
       'next-route-announcer',
       '#modalRoot',
+      // Google Maps widget (locations pages) — needs a billed API key and its
+      // interactive DOM (map tiles, markers, keyboard-shortcut text, "This page
+      // can't load Google Maps" notice) leaks noise into the import. Remove it
+      // before parsing; the branch/partner list beside it is kept.
+      '.gm-style',
+      '[aria-label="Map"]',
+      '[aria-roledescription="map"]',
+      'gmp-map',
+      'div[style*="z-index: 1000000"]',
     ]);
+    // Remove any element whose text is purely Google-Maps chrome.
+    element.querySelectorAll('div, section, aside').forEach((el) => {
+      const t = (el.textContent || '').trim();
+      if (/This page can't load Google Maps correctly|Do you own this website\?/i.test(t)
+        && t.length < 200) {
+        el.remove();
+      }
+    });
   }
 
   if (hookName === TransformHook.afterTransform) {
